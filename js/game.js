@@ -1,21 +1,15 @@
 
 let canvas;
-let ctx;
-let charakter = new MoveableObjects();
+let world;
 
 function init() {
-    canvas = document.getElementById("canvas");
-    ctx = canvas.getContext("2d");
+    
+    canvas = document.getElementById('canvas');
+    world = new World(canvas);
+    
 
 
-    console.log('My Character is ',charakter);
-
-
-    // charakter.src = "../images/2_character_pepe/2_walk/W-21.png";
-
-    // setTimeout( function() {
-    //     ctx.drawImage(charakter, 20, 20, 50, 100);
-    // }, 2000)
+    console.log('My Character is ', world.charakter);
 
     
 }
