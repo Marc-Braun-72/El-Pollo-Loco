@@ -2,20 +2,24 @@
 let canvas;
 let world;
 let keyboard = new Keyboard();
+let backgroundMusic;
 
 function init() {
-    
     canvas = document.getElementById('canvas');
     world = new World(canvas, keyboard);
 
-    console.log('My Character:', world.character);
-    
-}
+    backgroundMusic = new Audio('audio/ la-cucaracha-made-with-Voicemod.mp3');
+    backgroundMusic.loop = true;
+    backgroundMusic.volume = 0.5;
+    backgroundMusic.play(); 
+
+    console.log('My Character:', world.character); 
+} 
 
 window.addEventListener('keydown', (e) => {
     if(e.keyCode == 39) {
         keyboard.RIGHT = true;
-    }
+    } 
     if(e.keyCode == 37) {
         keyboard.LEFT = true;
     }

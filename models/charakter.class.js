@@ -46,7 +46,7 @@ class Character extends MoveableObject {
                 this.y -= this.accelleration
             }
         }, 1000 / 60);
-    }
+    } 
 
     isAboveGround() {
         return this.y < 180;
@@ -75,7 +75,6 @@ class Character extends MoveableObject {
             }
             this.world.camera_x = -this.x + 100;
 
-            // Sprungaktion erkennen und Ton abspielen
             if (this.world.keyboard.SPACE && !this.isJumping) {
                 this.isJumping = true;
                 this.jump_sound.play();
@@ -101,11 +100,11 @@ class Character extends MoveableObject {
     }
 
     jump() {
-        let jumpHeight = 140; 
+        let jumpHeight = 180; 
         let jumpDuration = 800; 
         let jumpSteps = 20; 
         let stepHeight = jumpHeight / jumpSteps;
-        let stepDuration = jumpDuration / (jumpSteps * 2); 
+        let stepDuration = jumpDuration / (jumpSteps * 3); 
 
         let upInterval = setInterval(() => {
             this.y -= stepHeight;
