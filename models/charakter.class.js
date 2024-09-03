@@ -4,6 +4,7 @@ class Character extends MoveableObject {
     width = 120;
     y = 180;
     speed = 10;
+
     IMAGES_WALKING = [
         'images/2_character_pepe/2_walk/W-21.png',
         'images/2_character_pepe/2_walk/W-22.png',
@@ -23,6 +24,21 @@ class Character extends MoveableObject {
         'images/2_character_pepe/3_jump/J-38.png',
         'images/2_character_pepe/3_jump/J-39.png'
     ];
+    IMAGES_DEAD = [
+        'images/2_character_pepe/5_dead/D-51.png',
+        'images/2_character_pepe/5_dead/D-52.png',
+        'images/2_character_pepe/5_dead/D-53.png',
+        'images/2_character_pepe/5_dead/D-54.png',
+        'images/2_character_pepe/5_dead/D-55.png',
+        'images/2_character_pepe/5_dead/D-56.png',
+        'images/2_character_pepe/5_dead/D-57.png'
+    ];
+    IMAGES_HURT = [
+        'images/2_character_pepe/4_hurt/H-41.png',
+        'images/2_character_pepe/4_hurt/H-42.png',
+        'images/2_character_pepe/4_hurt/H-43.png'
+    ];
+
     world;
     walking_sound = new Audio('./audio/running.mp3'); 
     jump_sound = new Audio('./audio/jump_short.mp3');
@@ -35,9 +51,12 @@ class Character extends MoveableObject {
         super().loadImage('./images/2_character_pepe/2_walk/W-21.png');
         this.loadImages(this.IMAGES_WALKING);
         this.loadImages(this.IMAGES_JUMPING);
+        this.loadImages(this.IMAGES_DEAD);
+        this.loadImages(this.IMAGES_HURT);
         this.applyGravity(); 
         this.animate();
-    }
+
+     } 
 
     applyGravity() {
         setInterval(() => { 
@@ -83,13 +102,20 @@ class Character extends MoveableObject {
         }, 1000 / 60);
 
         setInterval(() => {
-            if (this.isJumping) {
+            if (this.isDead()) {
+                this.playAnimation(this.IMAGES_DEAD);
+            } else if (this.isHurt()) {
+                this.playAnimation(this.IMAGES_HURT);
+            }
+            else if (this.isJumping) {
                 // Sprunganimation
                 let i = this.currentImage % this.IMAGES_JUMPING.length;
                 let path = this.IMAGES_JUMPING[i];
                 this.img = this.imageCache[path];
                 this.currentImage++;
-            } else if (this.world.keyboard.RIGHT || this.world.keyboard.LEFT) {
+            } else 
+            
+                if (this.world.keyboard.RIGHT || this.world.keyboard.LEFT) {
                 // Walk animation
                 let i = this.currentImage % this.IMAGES_WALKING.length;
                 let path = this.IMAGES_WALKING[i];

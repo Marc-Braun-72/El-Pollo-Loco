@@ -8,10 +8,10 @@ function init() {
     canvas = document.getElementById('canvas');
     world = new World(canvas, keyboard);
 
-    backgroundMusic = new Audio('audio/ la-cucaracha-made-with-Voicemod.mp3');
-    backgroundMusic.loop = true;
-    backgroundMusic.volume = 0.5;
-    backgroundMusic.play(); 
+    // backgroundMusic = new Audio('audio/la-cucaracha-made-with-Voicemod.mp3');
+    // backgroundMusic.loop = true;
+    // backgroundMusic.volume = 0.5;
+    // backgroundMusic.play(); 
 
     console.log('My Character:', world.character); 
 } 

@@ -1,10 +1,27 @@
 body {
     display: flex;
-    flex-direction: column;
-    align-items: center;
+    justify-content: center; /* Horizontales Zentrieren */
+    align-items: center; /* Vertikales Zentrieren */
+    height: 100vh; /* Höhe des Viewports */
+    margin: 0; /* Entfernen von Standard-Margin */
     font-family: 'Rye';
+    background-image: url('images/desert.svg');
+    background-repeat: no-repeat;
+    background-size: cover; /* Hintergrundbild soll den gesamten Hintergrund einnehmen */
+    background-position: center; /* Hintergrundbild zentrieren */
+}
+
+.gameContainer {
+    text-align: center; /* Zentrieren des Textes innerhalb des Containers */
+}
+
+h1 {
+    margin-bottom: 20px;
+    color: #000000;
+    text-shadow: 2px 2px 2px #ffffff;
 }
 
 canvas {
     background-color: transparent;
+    border: 1px solid #eeeeee;
 }
