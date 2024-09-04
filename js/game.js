@@ -16,6 +16,19 @@ function init() {
     console.log('My Character:', world.character); 
 } 
 
+// Opera 100vh Fix aus einem Video
+function checkOrientation() {
+    if (window.matchMedia("(orientation: landscape)").matches) {
+        if (window.innerHeight < 480) {
+            newHeight = window.innerHeight;
+            document.getElementById('canvas').style.height = `${newHeight}px`;
+        }
+    }
+    else {
+        document.getElementById('canvas').style.height = `100%`;
+    }
+}
+
 window.addEventListener('keydown', (e) => {
     if(e.keyCode == 39) {
         keyboard.RIGHT = true;

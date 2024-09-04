@@ -1,5 +1,4 @@
-class MoveableObject extends DrawableObject{
-
+class MoveableObject extends DrawableObject {
     speed = 0.15;
     otherDirection = false;
     speedY = 0;
@@ -9,11 +8,13 @@ class MoveableObject extends DrawableObject{
     bottlesCollected = 0;
     lastHit = 0;
 
+    intervals = []; // Array zur Verwaltung der Intervalle
+
     applyGravity() {
         setInterval(() => {
             if (this.isAboveGround() || this.speedY > 0)
             this.y -= this.speedY;
-            this.speedY -= this.acceleration;
+            this.speedY -= this.accelleration;
         }, 1000 / 25);
     }
 
@@ -24,7 +25,7 @@ class MoveableObject extends DrawableObject{
             return this.y < 180
         }
     }
-    
+
     // character.isColliding(chicken)
     // isColliding (obj) {
     // return  (this.X + this.width) >= obj.X && this.X <= (obj.X + obj.width) && 
@@ -59,7 +60,7 @@ class MoveableObject extends DrawableObject{
         return this.energy === 0;
     }
 
-    playAnimation(images)   {
+    playAnimation(images) {
         let i = this.currentImage % images.length;
         let path = images[i];
         this.img = this.imageCache[path];
@@ -67,7 +68,9 @@ class MoveableObject extends DrawableObject{
     }
 
     moveRight() {
-        console.log('Moving Right');
+        setInterval(() => {
+            this.x += this.speed;
+        }, 1000 / 60);
     }
 
     moveLeft() {

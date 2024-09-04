@@ -5,6 +5,30 @@ class Character extends MoveableObject {
     y = 180;
     speed = 10;
 
+    IMAGES_IDLE = [
+        'images/2_character_pepe/1_idle/idle/I-1.png',
+        'images/2_character_pepe/1_idle/idle/I-2.png',
+        'images/2_character_pepe/1_idle/idle/I-3.png',
+        'images/2_character_pepe/1_idle/idle/I-4.png',
+        'images/2_character_pepe/1_idle/idle/I-5.png',
+        'images/2_character_pepe/1_idle/idle/I-6.png',
+        'images/2_character_pepe/1_idle/idle/I-7.png',
+        'images/2_character_pepe/1_idle/idle/I-8.png',
+        'images/2_character_pepe/1_idle/idle/I-9.png',
+        'images/2_character_pepe/1_idle/idle/I-10.png'
+    ];
+    IMAGES_LONG_IDLE = [
+        'images/2_character_pepe/1_idle/long_idle/I-11.png',
+        'images/2_character_pepe/1_idle/long_idle/I-12.png',
+        'images/2_character_pepe/1_idle/long_idle/I-13.png',
+        'images/2_character_pepe/1_idle/long_idle/I-14.png',
+        'images/2_character_pepe/1_idle/long_idle/I-15.png',
+        'images/2_character_pepe/1_idle/long_idle/I-16.png',
+        'images/2_character_pepe/1_idle/long_idle/I-17.png',
+        'images/2_character_pepe/1_idle/long_idle/I-18.png',
+        'images/2_character_pepe/1_idle/long_idle/I-19.png',
+        'images/2_character_pepe/1_idle/long_idle/I-20.png'
+    ];
     IMAGES_WALKING = [
         'images/2_character_pepe/2_walk/W-21.png',
         'images/2_character_pepe/2_walk/W-22.png',
@@ -46,17 +70,104 @@ class Character extends MoveableObject {
     originalY = this.y;
     speedY = 0;
     accelleration = 2.5;
+    energy = 100; 
+    isGameOver = false; 
 
     constructor() {
         super().loadImage('./images/2_character_pepe/2_walk/W-21.png');
+        this.loadImages(this.IMAGES_IDLE);
+        this.loadImages(this.IMAGES_LONG_IDLE);
         this.loadImages(this.IMAGES_WALKING);
         this.loadImages(this.IMAGES_JUMPING);
-        this.loadImages(this.IMAGES_DEAD);
         this.loadImages(this.IMAGES_HURT);
-        this.applyGravity(); 
-        this.animate();
+        this.loadImages(this.IMAGES_DEAD);
+        
+        this.applyGravity();
 
-     } 
+        this.energy = 100; 
+        this.currentImage = 0; 
+        this.isGameOver = false;
+        this.gameOverImage = new Image();
+        this.gameOverImage.src = 'images/9_intro_outro_screens/game_over/game over.png';
+        this.gameOverImage.onload = () => {
+            this.gameOverImageLoaded = true;
+        };
+        this.gameLoopId = null; // Speichert die ID des Game Loop Intervals
+        this.animationIntervals = []; // Array für Intervalle erstellen
+        this.animate();
+        this.inactivityTime = 0; // Zeit der Inaktivität
+    }
+
+    startGameLoop() {
+        // Startet die Game Loop
+        this.gameLoopId = setInterval(() => {
+            this.update();
+        }, 1000 / 60); // 60 FPS
+    }
+
+    stopGameLoop() {
+        // Stoppt die Game Loop
+        if (this.gameLoopId !== null) {
+            clearInterval(this.gameLoopId);
+            this.gameLoopId = null;
+        }
+    }
+
+    update() {
+        if (this.isGameOver) {
+            this.drawGameOverScreen();
+            this.stopGameLoop(); // Stoppt die Game Loop
+        } else {
+            // Spiel-Update-Logiken
+        }
+    }
+
+
+    hit() {
+        this.energy -= 1; 
+        if (this.energy <= 0) {
+            this.energy = 0;
+            this.die();
+        }
+    }
+
+    isDead() {
+        return this.energy === 0;
+     }
+
+     die() {
+        this.isGameOver = true; // Setze den Spielstatus auf "Game Over"
+        this.stopAllAnimations(); // Stoppe alle Animationen
+        this.drawGameOverScreen(); // Zeige das "Game Over"-Bild an
+    }
+
+    gameOver(message = 'Spiel ist vorbei!') {
+        if (this.isGameOver) return;
+        this.isGameOver = true;
+        console.log(message);
+        this.drawGameOverScreen();
+        this.stopGameLoop(); // Stellt sicher, dass die Loop gestoppt wird
+    }
+
+    stopAllAnimations() {
+        this.animationIntervals.forEach(clearInterval); // Stoppe alle gespeicherten Intervalle
+        this.animationIntervals = []; // Leere das Array
+    }
+
+    drawGameOverScreen() {
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        ctx.clearRect(0, 0, canvas.width, canvas.height); // Lösche vorheriges Bild
+        ctx.drawImage(this.gameOverImage, 0, 0, canvas.width, canvas.height); // Zeichne das "Game Over"-Bild
+    }
+
+    loadImages(images) {
+        images.forEach((path) => {
+            let img = new Image();
+            img.src = path;
+            this.imageCache[path] = img;
+        });
+    }
 
     applyGravity() {
         setInterval(() => { 
@@ -79,18 +190,25 @@ class Character extends MoveableObject {
         });
     }
 
-    animate() {
+    jumpCollision(enemy) {
+        return this.isColliding(enemy) && this.isAboveGround();
+      }
+
+      animate() {
         setInterval(() => {
+
             this.walking_sound.pause();
             if (this.world.keyboard.RIGHT && this.x < this.world.level.level_end_x) {
                 this.x += this.speed;
                 this.otherDirection = false;
                 this.walking_sound.play();
+                this.inactivityTime = 0;
             }
             if (this.world.keyboard.LEFT && this.x > 0) {
                 this.x -= this.speed;
                 this.otherDirection = true;
                 this.walking_sound.play();
+                this.inactivityTime = 0;
             }
             this.world.camera_x = -this.x + 100;
 
@@ -98,6 +216,11 @@ class Character extends MoveableObject {
                 this.isJumping = true;
                 this.jump_sound.play();
                 this.jump();
+                this.inactivityTime = 0;
+            
+            } else {
+                this.walking_sound.pause();
+                this.inactivityTime += 120 / 60; // Erhöhe die Inaktivitätszeit
             }
         }, 1000 / 60);
 
@@ -106,26 +229,22 @@ class Character extends MoveableObject {
                 this.playAnimation(this.IMAGES_DEAD);
             } else if (this.isHurt()) {
                 this.playAnimation(this.IMAGES_HURT);
-            }
-            else if (this.isJumping) {
-                // Sprunganimation
-                let i = this.currentImage % this.IMAGES_JUMPING.length;
-                let path = this.IMAGES_JUMPING[i];
-                this.img = this.imageCache[path];
-                this.currentImage++;
-            } else 
-            
-                if (this.world.keyboard.RIGHT || this.world.keyboard.LEFT) {
-                // Walk animation
-                let i = this.currentImage % this.IMAGES_WALKING.length;
-                let path = this.IMAGES_WALKING[i];
-                this.img = this.imageCache[path];
-                this.currentImage++;
+            } else if (this.isJumping) {
+                this.playAnimation(this.IMAGES_JUMPING);
+            } else if (this.world.keyboard.RIGHT || this.world.keyboard.LEFT) {
+                this.playAnimation(this.IMAGES_WALKING);
+
+            } else if (this.inactivityTime > 2000) { // Wenn der Charakter länger als 5 Sekunden inaktiv ist
+
+                this.playAnimation(this.IMAGES_LONG_IDLE);
+
+            } else {
+                this.playAnimation(this.IMAGES_IDLE);
             }
         }, 50);
     }
 
-    jump() {
+     jump() {
         let jumpHeight = 180; 
         let jumpDuration = 800; 
         let jumpSteps = 20; 

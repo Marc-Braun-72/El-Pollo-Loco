@@ -39,6 +39,7 @@ class World {
     }
 
     checkCollisions() {
+        setInterval(() => {
         this.level.enemies.forEach((enemy) => {
             if (this.character.isColliding(enemy)) {
                 
@@ -47,6 +48,7 @@ class World {
                 console.log('Collision with Charakter, energy ', this.character.energy);
                 }
         });
+    }, 200);
     }    
 
     draw() {
