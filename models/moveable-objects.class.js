@@ -8,7 +8,7 @@ class MoveableObject extends DrawableObject {
     bottlesCollected = 0;
     lastHit = 0;
 
-    intervals = []; // Array zur Verwaltung der Intervalle
+    intervals = []; 
 
     applyGravity() {
         setInterval(() => {
@@ -59,7 +59,7 @@ class MoveableObject extends DrawableObject {
     isDead() {
         return this.energy === 0;
     }
-
+ 
     playAnimation(images) {
         let i = this.currentImage % images.length;
         let path = images[i];
@@ -78,4 +78,5 @@ class MoveableObject extends DrawableObject {
             this.x -= this.speed;
         }, 1000 / 60);
     }
+    
 }

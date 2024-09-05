@@ -1,4 +1,7 @@
 class StatusBarBottles extends DrawableObject {
+
+    bottleCount = 0;
+
     IMAGES_BOTTLE = [
         'images/7_statusbars/1_statusbar/3_statusbar_bottle/orange/0.png', // 0
         'images/7_statusbars/1_statusbar/3_statusbar_bottle/orange/20.png',
@@ -17,10 +20,9 @@ class StatusBarBottles extends DrawableObject {
         this.y = 50;
         this.width = 200;
         this.height = 60;
-        this.setPercentage(100);
+        this.setPercentage(0);
     }
 
-    // setPercentage(50) 
     setPercentage(percentage) {
         this.percentage = percentage;
         let path = this.IMAGES_BOTTLE[this.resolveImageIndex()];
@@ -41,5 +43,10 @@ class StatusBarBottles extends DrawableObject {
         } else {
             return 0;
         }
+    }
+
+    addBottle() {
+        this.bottleCount++;
+        this.setPercentage(this.bottleCount * 20); 
     }
 }

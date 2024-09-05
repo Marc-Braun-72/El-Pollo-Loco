@@ -87,44 +87,31 @@ class Character extends MoveableObject {
         this.energy = 100; 
         this.currentImage = 0; 
         this.isGameOver = false;
-        this.gameOverImage = new Image();
-        this.gameOverImage.src = 'images/9_intro_outro_screens/game_over/game over.png';
-        this.gameOverImage.onload = () => {
-            this.gameOverImageLoaded = true;
-        };
-        this.gameLoopId = null; // Speichert die ID des Game Loop Intervals
-        this.animationIntervals = []; // Array für Intervalle erstellen
+        this.gameLoopId = null; 
+        this.animationIntervals = []; 
         this.animate();
-        this.inactivityTime = 0; // Zeit der Inaktivität
+        this.inactivityTime = 0; 
+        this.startGameLoop();
+        this.bottles = []; 
+        this.coins = [];   
     }
 
     startGameLoop() {
-        // Startet die Game Loop
         this.gameLoopId = setInterval(() => {
             this.update();
-        }, 1000 / 60); // 60 FPS
+        }, 1000 / 60); 
     }
 
     stopGameLoop() {
-        // Stoppt die Game Loop
+        console.log('Stopping game loop');
         if (this.gameLoopId !== null) {
             clearInterval(this.gameLoopId);
             this.gameLoopId = null;
         }
     }
 
-    update() {
-        if (this.isGameOver) {
-            this.drawGameOverScreen();
-            this.stopGameLoop(); // Stoppt die Game Loop
-        } else {
-            // Spiel-Update-Logiken
-        }
-    }
-
-
     hit() {
-        this.energy -= 1; 
+        this.energy -= 10; 
         if (this.energy <= 0) {
             this.energy = 0;
             this.die();
@@ -136,30 +123,53 @@ class Character extends MoveableObject {
      }
 
      die() {
-        this.isGameOver = true; // Setze den Spielstatus auf "Game Over"
-        this.stopAllAnimations(); // Stoppe alle Animationen
-        this.drawGameOverScreen(); // Zeige das "Game Over"-Bild an
+        if (this.alreadyDead) return;
+        this.alreadyDead = true;
+        this.energy = 0;
+        console.log('Character died, triggering game over');
+        if (this.world) {
+            this.world.gameOver();
+        } else {
+            console.error('World reference is missing in Character');
+        }
     }
+
+
 
     gameOver(message = 'Spiel ist vorbei!') {
         if (this.isGameOver) return;
         this.isGameOver = true;
         console.log(message);
         this.drawGameOverScreen();
-        this.stopGameLoop(); // Stellt sicher, dass die Loop gestoppt wird
+        this.stopGameLoop(); 
     }
 
-    stopAllAnimations() {
-        this.animationIntervals.forEach(clearInterval); // Stoppe alle gespeicherten Intervalle
-        this.animationIntervals = []; // Leere das Array
+    playAnimation(images) {
+        let i = this.currentImage % images.length; 
+        let path = images[i]; 
+        this.img = this.imageCache[path]; 
+        this.currentImage++; 
     }
+    
+
+    stopAllAnimations() {
+        clearInterval(this.animateInterval);
+
+    }
+    
 
     drawGameOverScreen() {
         const canvas = document.getElementById('canvas');
+        if (!canvas) return; 
         const ctx = canvas.getContext('2d');
-        ctx.clearRect(0, 0, canvas.width, canvas.height); // Lösche vorheriges Bild
-        ctx.drawImage(this.gameOverImage, 0, 0, canvas.width, canvas.height); // Zeichne das "Game Over"-Bild
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        if (this.gameOverImageLoaded) {
+            ctx.drawImage(this.gameOverImage, 0, 0, canvas.width, canvas.height);
+        } else {
+            console.log("Game over image not loaded");
+        }
     }
+    
 
     loadImages(images) {
         images.forEach((path) => {
@@ -170,13 +180,13 @@ class Character extends MoveableObject {
     }
 
     applyGravity() {
-        setInterval(() => { 
-            if (this.isAboveGround()) {
+        this.gravityIntervalId = setInterval(() => { 
+            if (!this.isGameOver && this.isAboveGround()) {
                 this.y -= this.speedY;
-                this.y -= this.accelleration
+                this.y -= this.accelleration;
             }
         }, 1000 / 60);
-    } 
+    }
 
     isAboveGround() {
         return this.y < 180;
@@ -220,7 +230,7 @@ class Character extends MoveableObject {
             
             } else {
                 this.walking_sound.pause();
-                this.inactivityTime += 120 / 60; // Erhöhe die Inaktivitätszeit
+                this.inactivityTime += 120 / 60; 
             }
         }, 1000 / 60);
 
@@ -229,12 +239,20 @@ class Character extends MoveableObject {
                 this.playAnimation(this.IMAGES_DEAD);
             } else if (this.isHurt()) {
                 this.playAnimation(this.IMAGES_HURT);
-            } else if (this.isJumping) {
-                this.playAnimation(this.IMAGES_JUMPING);
+             } else if (this.isJumping) {
+                // Sprunganimation
+                let i = this.currentImage % this.IMAGES_JUMPING.length;
+                let path = this.IMAGES_JUMPING[i];
+                this.img = this.imageCache[path];
+                this.currentImage++;
             } else if (this.world.keyboard.RIGHT || this.world.keyboard.LEFT) {
-                this.playAnimation(this.IMAGES_WALKING);
+                // Walk animation
+                let i = this.currentImage % this.IMAGES_WALKING.length;
+                let path = this.IMAGES_WALKING[i];
+                this.img = this.imageCache[path];
+                this.currentImage++;
 
-            } else if (this.inactivityTime > 2000) { // Wenn der Charakter länger als 5 Sekunden inaktiv ist
+            } else if (this.inactivityTime > 2000) { 
 
                 this.playAnimation(this.IMAGES_LONG_IDLE);
 

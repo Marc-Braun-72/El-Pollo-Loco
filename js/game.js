@@ -8,12 +8,10 @@ function init() {
     canvas = document.getElementById('canvas');
     world = new World(canvas, keyboard);
 
-    // backgroundMusic = new Audio('audio/la-cucaracha-made-with-Voicemod.mp3');
+    // backgroundMusic = new Audio('audio/la_cucaracha.mp3');
     // backgroundMusic.loop = true;
     // backgroundMusic.volume = 0.5;
     // backgroundMusic.play(); 
-
-    console.log('My Character:', world.character); 
 } 
 
 // Opera 100vh Fix aus einem Video
