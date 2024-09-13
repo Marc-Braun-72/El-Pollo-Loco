@@ -1,12 +1,27 @@
 class Endboss extends MoveableObject {
+    INITIAL_ENERGY = 100;
+    energy = this.INITIAL_ENERGY;
+    intervals = [];  
+    attackInterval; 
+    NORMAL_SPEED = 50; 
+    ATTACK_SPEED = 80;  
+
     constructor() {
         super().loadImage('images/4_enemie_boss_chicken/1_walk/G1.png');
-        this.x = 2000; 
-        this.y = -20; 
-        this.height = 500;
+        this.x = 2000;
+        this.y = 50;
+        this.height = 400;
         this.width = 300;
+        this.speed = 2.5;
+        this.energy = 100; 
         this.loadImages(this.IMAGES_WALKING);
+        this.loadImages(this.IMAGES_ALERT);
+        this.loadImages(this.IMAGES_ATTACK);
+        this.loadImages(this.IMAGES_HURT);
+        this.loadImages(this.IMAGES_DEAD);
+        this.state = 'idle';
         this.animate();
+        this.speed = this.NORMAL_SPEED; 
     }
 
     IMAGES_WALKING = [
@@ -54,12 +69,114 @@ class Endboss extends MoveableObject {
         });
     }
 
-    animate() {
-        setInterval(() => {
-            let i = this.currentImage % this.IMAGES_WALKING.length;
-            let path = this.IMAGES_WALKING[i];
-            this.img = this.imageCache[path];
-            this.currentImage++;
-        }, 200);
+    hit() {
+        if (this.isDying) return;
+        this.energy -= 20;
+        this.energy = Math.max(0, this.energy);
+        if (this.world && this.world.statusBarEndboss) {
+            this.world.statusBarEndboss.setPercentage(this.energy / this.INITIAL_ENERGY * 100);
+        }
+    
+        if (this.energy === 0 && !this.isDying) {
+            this.isDying = true;
+            this.playAnimation(this.IMAGES_DEAD);
+            setTimeout(() => {
+                this.die();
+            }, 1000);
+        } else {
+            this.playAnimation(this.IMAGES_HURT);
+        }
     }
+    
+    showHurtAnimation() {
+        this.state = 'hurt';
+        setTimeout(() => {
+            this.state = 'walking';
+        }, 500);
+    }
+
+    die() {
+        if (this.isDead()) return;
+        this.isDying = false;
+        this.energy = 0;
+        this.playAnimation(this.IMAGES_DEAD);
+        if (this.world) {
+            this.world.checkGameState();
+        }
+    }
+    
+    isDead() {
+        return this.energy <= 0;
+    }
+
+    becomeAlert() {
+        this.state = 'alert';
+        this.playAnimation(this.IMAGES_ALERT);
+        clearInterval(this.attackInterval); 
+
+        if (this.world) {
+            setTimeout(() => {
+                this.attackInterval = setInterval(() => {
+                    this.attack();
+                }, 2000);
+            }, 1000);
+        }
+    }
+
+    attack() {
+        this.state = 'attack';
+        this.speed = this.ATTACK_SPEED; 
+        this.playAnimation(this.IMAGES_ATTACK);
+
+        if (this.world && this.world.character) {
+            if (this.world.character.x < this.x) {
+                this.moveLeft();
+            }
+        }
+
+        setTimeout(() => {
+            this.speed = this.NORMAL_SPEED;  
+            this.state = 'walking';  
+            this.playAnimation(this.IMAGES_WALKING);
+        }, 1000); 
+    }
+
+    stopAttack() {
+        clearInterval(this.attackInterval);
+    }
+
+    animate() {
+        let animationInterval = setInterval(() => {
+            if (this.state === 'idle') {
+                this.playAnimation(this.IMAGES_WALKING);
+            } else if (this.state === 'alert') {
+                this.playAnimation(this.IMAGES_ALERT);
+            } else if (this.state === 'walking') {
+                this.playAnimation(this.IMAGES_WALKING);
+                this.moveLeft();
+            } else if (this.state === 'hurt') {
+                this.playAnimation(this.IMAGES_HURT);
+            } else if (this.state === 'dead') {
+                this.playAnimation(this.IMAGES_DEAD);
+            }
+        }, 200);
+        this.intervals.push(animationInterval); 
+    }
+
+    stopAnimation() {
+        this.intervals.forEach(interval => clearInterval(interval));  
+        this.intervals = []; 
+    }
+
+    playAnimation(images) {
+        let i = this.currentImage % images.length;
+        let path = images[i];
+        this.img = this.imageCache[path];
+        this.currentImage++;
+    }
+
+    moveLeft() {
+        this.x -= this.speed;
+    }
+
 }

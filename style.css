@@ -1,42 +1,157 @@
 body {
+    margin: 0;
+    padding: 0;
     display: flex;
-    justify-content: center; /* Horizontales Zentrieren */
-    align-items: center; /* Vertikales Zentrieren */
-    height: 100vh; /* Höhe des Viewports */
-    margin: 0; /* Entfernen von Standard-Margin */
-    font-family: 'Rye';
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    height: 100vh;
+    font-family: 'Rye', cursive;
     background-image: url('images/desert.svg');
     background-repeat: no-repeat;
-    background-size: cover; /* Hintergrundbild soll den gesamten Hintergrund einnehmen */
-    background-position: center; /* Hintergrundbild zentrieren */
+    background-size: cover;
+    background-position: center;
 }
 
 .gameContainer {
-    text-align: center; /* Zentrieren des Textes innerhalb des Containers */
+    position: relative;
+    width: 720px;
+    height: 480px;
+    margin: 0 auto;
 }
 
 h1 {
-    margin-bottom: 20px;
-    color: #000000;
-    text-shadow: 2px 2px 2px #ffffff;
+    position: relative;
+    margin: 0;
+    padding: 10px 0;
+    font-size: 36px;
+    text-align: center;
+    text-shadow: 2px 2px 2px rgba(0, 0, 0, 0.5);
 }
 
 canvas {
     background-color: transparent;
-    border: 1px solid #eeeeee;
+    border: 1px solid orange;
     display: block;
+    margin: 0 auto;
+}
+
+.overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    z-index: 10;
+}
+
+.start-image {
+    width: 100%;
+    height: 100%;
+    object-fit: fill;
+    object-position: center;
+}
+
+#restartButton,
+#startButton {
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: orange;
+    padding: 10px 20px;
+    font-size: 20px;
+    color: #000000;
+    border: 1px solid #000000;
+    border-radius: 5px;
+    cursor: pointer;
+    z-index: 10;
+    font-family: 'Rye', cursive;
+}
+
+#restartButton:hover,
+#startButton:hover {
+    background-color: darkorange;
+}
+
+.controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-radius: 10px;
+    padding: 10px;
+    margin-top: 10px;
+    width: 700px;
+    height: 60px;
+}
+
+.item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin: 0 5px;
+    flex: 1;
+}
+
+.chevron, .space-bar {
+    background-color: #FFD700;
+    border-radius: 5px;
+    padding: 5px 15px;
+    margin-bottom: 2px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    width: 40px;
+    height: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.chevron .arrows,
+.controls .item .chevron span#fullscreenButton {
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.chevron.arrows {
+    align-items: end;
+}
+
+.control-text {
+    font-size: 10px;
+    text-align: center;
+    margin-top: 6px;
+}
+
+.fullscreen-icon::before {
+    content: '[ ]';
+    font-size: 24px;
+    font-weight: lighter;
+}
+
+.controls .item .chevron span#fullscreenButton {
+    cursor: pointer;
+}
+
+.controls .item .chevron span#fullscreenButton:hover {
+    color: #000000;
 }
 
 @media only screen and (max-width: 720px) {
     canvas {
         width: 100%;
-    }  
+    }
 }
 
 @media only screen and (max-height: 480px) {
     canvas {
         height: 100vh;
     }
+    
     h1 {
         display: none;
     }

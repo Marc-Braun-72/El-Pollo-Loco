@@ -1,7 +1,7 @@
 class Character extends MoveableObject {
 
     height = 250;
-    width = 120;
+    width = 125;
     y = 180;
     speed = 10;
 
@@ -75,18 +75,33 @@ class Character extends MoveableObject {
 
     constructor() {
         super().loadImage('./images/2_character_pepe/2_walk/W-21.png');
+        this.offset = {
+            top: 20,
+            bottom: 10,
+            left: 15,
+            right: 15
+        };
         this.loadImages(this.IMAGES_IDLE);
         this.loadImages(this.IMAGES_LONG_IDLE);
         this.loadImages(this.IMAGES_WALKING);
         this.loadImages(this.IMAGES_JUMPING);
         this.loadImages(this.IMAGES_HURT);
         this.loadImages(this.IMAGES_DEAD);
-        
+        this.gameOverImage = new Image();
+        this.gameOverImage.src = 'images/9_intro_outro_screens/game_over/game over.png';
+        this.winImage = new Image();
+        this.winImage.src = 'images/9_intro_outro_screens/win/win_2.png';
+        this.gameOverImage.onload = () => {
+            this.gameOverImageLoaded = true;
+        };
+        this.winImage.onload = () => {
+            this.winImageLoaded = true;
+        };
         this.applyGravity();
-
         this.energy = 100; 
         this.currentImage = 0; 
         this.isGameOver = false;
+        this.isHurt = false; 
         this.gameLoopId = null; 
         this.animationIntervals = []; 
         this.animate();
@@ -96,6 +111,25 @@ class Character extends MoveableObject {
         this.coins = [];   
     }
 
+    resetCharacter() {
+        this.x = 100;  
+        this.y = 180;  
+        this.energy = 100;  
+        this.inactivityTime = 0; 
+        this.isJumping = false;  
+        this.lastHit = 0;  
+        this.currentImage = 0;  
+        this.loadImage(this.IMAGES_IDLE[0]); 
+    }
+
+    isColliding(mo) {
+        if (!mo.offset) mo.offset = { top: 0, bottom: 0, left: 0, right: 0 };  
+        return this.x + this.width - this.offset.right > mo.x + mo.offset.left &&
+               this.x + this.offset.left < mo.x + mo.width - mo.offset.right &&
+               this.y + this.height - this.offset.bottom > mo.y + mo.offset.top &&
+               this.y + this.offset.top < mo.y + mo.height - mo.offset.bottom;
+    }
+    
     startGameLoop() {
         this.gameLoopId = setInterval(() => {
             this.update();
@@ -103,73 +137,157 @@ class Character extends MoveableObject {
     }
 
     stopGameLoop() {
-        console.log('Stopping game loop');
         if (this.gameLoopId !== null) {
             clearInterval(this.gameLoopId);
             this.gameLoopId = null;
         }
     }
 
+    update() {
+    }
+
+    updateAnimation() {
+    }
+
+    checkCollisions() {
+        this.level.enemies.forEach((enemy, index) => {
+            if (enemy instanceof Chicken) {
+                if (this.character.isColliding(enemy)) {
+                    if (this.character.isFallingOn(enemy)) {
+                        enemy.die();  
+                        this.playChickenDeathSound();
+                        setTimeout(() => {
+                            this.level.enemies.splice(index, 1); 
+                        }, 500);
+                    } else {
+                        this.character.hit();  
+                        this.statusBar.setPercentage(this.character.energy); 
+                    }
+                }
+            }
+        });
+    }
+
+    isFallingOn(mo) {
+    return this.speedY < 0 &&  
+           this.y + this.height - this.offset.bottom < mo.y + mo.height &&  
+           this.y + this.height - this.offset.bottom > mo.y;  
+    }   
+
     hit() {
-        this.energy -= 10; 
+        this.energy -= 2; 
         if (this.energy <= 0) {
             this.energy = 0;
             this.die();
+        } else {
+            this.isHurt = true;  
+            setTimeout(() => {
+                this.isHurt = false; 
+            }, 1000);  
         }
     }
-
+    
     isDead() {
         return this.energy === 0;
-     }
+    }
 
-     die() {
+    die() {
         if (this.alreadyDead) return;
         this.alreadyDead = true;
-        this.energy = 0;
-        console.log('Character died, triggering game over');
-        if (this.world) {
-            this.world.gameOver();
-        } else {
-            console.error('World reference is missing in Character');
-        }
+        this.playDeathAnimation();
+    }
+    
+    playDeathAnimation() {
+        let currentFrame = 0;
+        const deathAnimationInterval = setInterval(() => {
+            if (currentFrame < this.IMAGES_DEAD.length) {
+                this.img = this.imageCache[this.IMAGES_DEAD[currentFrame]];
+                currentFrame++;
+            } else {
+                clearInterval(deathAnimationInterval);
+                if (this.world && !this.world.isGameOver) {
+                    this.world.gameOver('Game Over', false);
+                }
+            }
+        }, 200);
     }
 
-
-
-    gameOver(message = 'Spiel ist vorbei!') {
+    gameOver(message = 'Spiel ist vorbei!', isWin = false) {
         if (this.isGameOver) return;
         this.isGameOver = true;
-        console.log(message);
-        this.drawGameOverScreen();
-        this.stopGameLoop(); 
+    
+        setTimeout(() => {
+            if (isWin) {
+                this.drawWinScreen();
+            } else {
+                this.drawGameOverScreen();
+            }
+            this.stopGameLoop();
+            this.stopAllAnimations();
+    
+            document.getElementById('restartButton').style.display = 'block';
+        }, 500); 
+    }
+    
+    drawWinScreen() {
+        const canvas = document.getElementById('canvas');
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        if (this.winImageLoaded) {
+            ctx.drawImage(this.winImage, 0, 0, canvas.width, canvas.height);
+        } 
     }
 
+    drawEndScreen(isWin) {
+        const canvas = document.getElementById('canvas');
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        if (isWin && this.winImageLoaded) {
+            ctx.drawImage(this.winImage, 0, 0, canvas.width, canvas.height);
+        } else if (!isWin && this.gameOverImageLoaded) {
+            ctx.drawImage(this.gameOverImage, 0, 0, canvas.width, canvas.height);
+        } 
+    }
+
+    drawGameOverScreen() {
+        const canvas = document.getElementById('canvas');
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        if (this.gameOverImageLoaded) {
+            ctx.drawImage(this.gameOverImage, 0, 0, canvas.width, canvas.height);
+        } 
+    }
+    
     playAnimation(images) {
         let i = this.currentImage % images.length; 
         let path = images[i]; 
         this.img = this.imageCache[path]; 
         this.currentImage++; 
     }
-    
 
     stopAllAnimations() {
-        clearInterval(this.animateInterval);
-
-    }
-    
-
-    drawGameOverScreen() {
-        const canvas = document.getElementById('canvas');
-        if (!canvas) return; 
-        const ctx = canvas.getContext('2d');
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        if (this.gameOverImageLoaded) {
-            ctx.drawImage(this.gameOverImage, 0, 0, canvas.width, canvas.height);
-        } else {
-            console.log("Game over image not loaded");
+        if (this.animateInterval) {
+            clearInterval(this.animateInterval);
+            this.animateInterval = null;
         }
-    }
     
+        this.animationIntervals.forEach(interval => clearInterval(interval));
+        this.animationIntervals = [];
+    
+        if (this.gravityIntervalId) {
+            clearInterval(this.gravityIntervalId);
+            this.gravityIntervalId = null;
+        }
+    
+        this.walking_sound.pause();
+        this.jump_sound.pause();
+    
+        this.currentImage = 0;
+        this.img = this.imageCache[this.IMAGES_IDLE[0]];
+    }
 
     loadImages(images) {
         images.forEach((path) => {
@@ -202,11 +320,22 @@ class Character extends MoveableObject {
 
     jumpCollision(enemy) {
         return this.isColliding(enemy) && this.isAboveGround();
-      }
+    }
 
-      animate() {
-        setInterval(() => {
+    bounce() {
+        this.speedY = -15; 
+    }
 
+    isJumpingOn(chicken) {
+        return this.isAboveGround() && 
+               this.x < chicken.x + chicken.width &&
+               this.x + this.width > chicken.x &&
+               this.y + this.height > chicken.y &&
+               this.y + this.height < chicken.y + chicken.height / 2;
+    }
+    
+    animate() {
+        let moveInterval = setInterval(() => {
             this.walking_sound.pause();
             if (this.world.keyboard.RIGHT && this.x < this.world.level.level_end_x) {
                 this.x += this.speed;
@@ -221,47 +350,39 @@ class Character extends MoveableObject {
                 this.inactivityTime = 0;
             }
             this.world.camera_x = -this.x + 100;
-
+    
             if (this.world.keyboard.SPACE && !this.isJumping) {
                 this.isJumping = true;
                 this.jump_sound.play();
                 this.jump();
                 this.inactivityTime = 0;
-            
             } else {
                 this.walking_sound.pause();
-                this.inactivityTime += 120 / 60; 
+                this.inactivityTime += 180 / 60; 
             }
         }, 1000 / 60);
-
-        setInterval(() => {
+        
+        this.animationIntervals.push(moveInterval); 
+        
+        let animationInterval = setInterval(() => {
             if (this.isDead()) {
                 this.playAnimation(this.IMAGES_DEAD);
-            } else if (this.isHurt()) {
+            } else if (this.isHurt) { 
                 this.playAnimation(this.IMAGES_HURT);
-             } else if (this.isJumping) {
-                // Sprunganimation
-                let i = this.currentImage % this.IMAGES_JUMPING.length;
-                let path = this.IMAGES_JUMPING[i];
-                this.img = this.imageCache[path];
-                this.currentImage++;
+            } else if (this.isJumping) {
+                this.playAnimation(this.IMAGES_JUMPING);
             } else if (this.world.keyboard.RIGHT || this.world.keyboard.LEFT) {
-                // Walk animation
-                let i = this.currentImage % this.IMAGES_WALKING.length;
-                let path = this.IMAGES_WALKING[i];
-                this.img = this.imageCache[path];
-                this.currentImage++;
-
-            } else if (this.inactivityTime > 2000) { 
-
+                this.playAnimation(this.IMAGES_WALKING);
+            } else if (this.inactivityTime > 1000) { 
                 this.playAnimation(this.IMAGES_LONG_IDLE);
-
             } else {
                 this.playAnimation(this.IMAGES_IDLE);
             }
         }, 50);
+        
+        this.animationIntervals.push(animationInterval);  
     }
-
+    
      jump() {
         let jumpHeight = 180; 
         let jumpDuration = 800; 

@@ -7,19 +7,8 @@ class DrawableObject {
     imageCache = {};
     currentImage = 0;
 
-
     drawImage(ctx) {
         ctx.drawImage(this.img, this.x, this.y, this.width, this.height);
-    }
-
-    drawFrame(ctx) {
-        if (this instanceof Character || this instanceof Chicken) {
-            ctx.beginPath();
-            ctx.lineWidth = '5';
-            ctx.strokeStyle = 'red';
-            ctx.rect(this.x, this.y, this.width, this.height);
-            ctx.stroke();
-        }
     }
 
     loadImage(path) {
@@ -35,6 +24,4 @@ class DrawableObject {
             this.imageCache[path] = img;
         });
     }
-
-
 }

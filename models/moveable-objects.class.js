@@ -7,43 +7,55 @@ class MoveableObject extends DrawableObject {
     coinsCollected = 0;
     bottlesCollected = 0;
     lastHit = 0;
-
     intervals = []; 
 
     applyGravity() {
-        setInterval(() => {
-            if (this.isAboveGround() || this.speedY > 0)
-            this.y -= this.speedY;
+        let gravityInterval = setInterval(() => {
+            if (this.isAboveGround() || this.speedY > 0) {
+                this.y -= this.speedY;
+            }
             this.speedY -= this.accelleration;
         }, 1000 / 25);
+        this.intervals.push(gravityInterval); 
     }
 
+    moveRight() {
+        let moveRightInterval = setInterval(() => {
+            this.x += this.speed;
+        }, 1000 / 60);
+        this.intervals.push(moveRightInterval);  
+    }
+
+    moveLeft() {
+        let moveLeftInterval = setInterval(() => {
+            this.x -= this.speed;
+        }, 1000 / 60);
+        this.intervals.push(moveLeftInterval);  
+    }
+
+    stopAllIntervals() {
+        this.intervals.forEach(interval => clearInterval(interval));  
+        this.intervals = [];  
+    }
+    
     isAboveGround() {
         if (this instanceof ThrowableObject) {
             return true;
         } else {
-            return this.y < 180
+            return this.y < 180;
         }
     }
 
-    // character.isColliding(chicken)
-    // isColliding (obj) {
-    // return  (this.X + this.width) >= obj.X && this.X <= (obj.X + obj.width) && 
-    //         (this.Y + this.offsetY + this.height) >= obj.Y &&
-    //         (this.Y + this.offsetY) <= (obj.Y + obj.height) && 
-    //         obj.onCollisionCourse; // Optional: hiermit könnten wir schauen, ob ein Objekt sich in die richtige Richtung bewegt. Nur dann kollidieren wir. Nützlich bei Gegenständen, auf denen man stehen kann.
-    // }
-
     isColliding(mo) {
         return this.x + this.width > mo.x && 
-            this.y + this.height > mo.y &&
-            this.x < mo.x &&
-            this.y < mo.y + mo.height;
+               this.y + this.height > mo.y &&
+               this.x < mo.x &&
+               this.y < mo.y + mo.height;
     }
 
     hit() {
         this.energy -= 5;
-        if(this.energy <= 0) {
+        if (this.energy <= 0) {
             this.energy = 0;
         } else {
             this.lastHit = new Date().getTime();
@@ -59,24 +71,11 @@ class MoveableObject extends DrawableObject {
     isDead() {
         return this.energy === 0;
     }
- 
+
     playAnimation(images) {
         let i = this.currentImage % images.length;
         let path = images[i];
         this.img = this.imageCache[path];
         this.currentImage++;
     }
-
-    moveRight() {
-        setInterval(() => {
-            this.x += this.speed;
-        }, 1000 / 60);
-    }
-
-    moveLeft() {
-        setInterval(() => {
-            this.x -= this.speed;
-        }, 1000 / 60);
-    }
-    
 }

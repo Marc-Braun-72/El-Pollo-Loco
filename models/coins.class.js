@@ -6,8 +6,9 @@ class Coins extends MoveableObject {
         'images/8_coin/coin_2.png'
     ];
     currentImage = 0;
-    animationInterval = 200; 
+    animationInterval = 100; 
     lastAnimationTime = 0;
+    intervals = [];  
 
     constructor() {
         super();
@@ -15,7 +16,6 @@ class Coins extends MoveableObject {
         this.x = 200 + Math.random() * 1500; 
         this.y = 150 + Math.random() * 250; 
         this.setImage(this.IMAGES_COINS[0]); 
-        console.log(`Coin created at x: ${this.x}, y: ${this.y}`);
         this.animate();
     }
     
@@ -24,10 +24,18 @@ class Coins extends MoveableObject {
     }
 
     animate() {
-        setInterval(() => {
+        let coinInterval = setInterval(() => {
             this.playAnimation(this.IMAGES_COINS);
         }, this.animationInterval);
+        this.intervals.push(coinInterval);  
     }
+
+    stopAnimation() {
+        if (this.animationInterval) {
+          clearInterval(this.animationInterval);
+          this.animationInterval = null;
+        }
+      }
 
     playAnimation(images) {
         let currentTime = new Date().getTime();

@@ -13,152 +13,422 @@ class World {
     coins = [];
     bottles = [];
     score = 0;
- 
+    damageSound = new Audio('audio/damage.mp3');
+
     constructor(canvas, keyboard) {
-        this.ctx = canvas.getContext('2d');
-        this.canvas = canvas;
+        this.initializeCanvas(canvas);
         this.keyboard = keyboard;
+        this.lastThrowTime = 0;
+        this.throwCooldown = 500;
+        this.endbossAlerted = false;
+    
+        this.initializeGameObjects();
+        this.initializeImages();
+        this.initializeWorld();
+    }
+    
+    initializeCanvas(canvas) {
+        this.canvas = canvas;
+        this.ctx = canvas.getContext('2d');
+    }
+    
+    initializeGameObjects() {
         this.coins = this.createCoins();
         this.bottles = this.createBottles();
         this.statusBarBottles = new StatusBarBottles();
-        this.draw();
+        this.statusBarCoins = new StatusBarCoins();
+        this.statusBarEndboss = new StatusBarEndboss();
+        this.level.enemies.forEach(enemy => {
+            if (enemy instanceof Endboss) {
+                enemy.world = this;
+            }
+        });
+    }
+    
+    initializeImages() {
+        this.gameOverImage = this.loadImage('images/9_intro_outro_screens/game_over/game over.png');
+        this.winImage = this.loadImage('images/9_intro_outro_screens/win/win_2.png');
+    }
+    
+    initializeWorld() {
         this.setWorld();
+        this.level.enemies.forEach(enemy => {
+            if (enemy instanceof Endboss) {
+                enemy.world = this;
+                enemy.energy = enemy.INITIAL_ENERGY || 100;  
+            }
+        });
+    }
+    
+    start() {
         this.run();
-        this.gameOverImage = new Image();
-        this.gameOverImage.src = 'images/9_intro_outro_screens/game_over/game over.png';
-        this.gameOverImage.onload = () => {
-            console.log('Game over image loaded successfully');
-            this.gameOverImageLoaded = true;
+        this.draw();
+    }
+    
+    loadImage(src, onload = null) {
+        const img = new Image();
+        img.src = src;
+        img.onload = () => {
+            this[`${src.split('/').pop().split('.')[0]}Loaded`] = true;
+            if (onload) onload();
         };
-        this.gameOverImage.onerror = (e) => {
-            console.error('Error loading game over image:', e);
-        };
+        return img;
+    }
+
+    assignWorldToEnemies() {
+        if (this.level && this.level.enemies) {
+            this.level.enemies.forEach(enemy => {
+                if (enemy instanceof Endboss) {
+                    enemy.world = this;
+                }
+            });
+        }
+    }
+    
+    stop() {
+        if (this.gameLoopId) {
+            clearInterval(this.gameLoopId); 
+            this.gameLoopId = null;  
+        }
+        this.character.stopAllAnimations();
+    }
+
+    stopAnimationLoop() {
+        if (this.animationFrameId) {
+          cancelAnimationFrame(this.animationFrameId);
+          this.animationFrameId = null;
+        }
+    }
+    
+    stopAllAnimations() {
+        this.stopAnimationLoop();
+        if (this.character && typeof this.character.stopAllAnimations === 'function') {
+            this.character.stopAllAnimations();
+        }
+        this.level.enemies.forEach(enemy => {
+            if (enemy instanceof MoveableObject && typeof enemy.stopAnimation === 'function') {
+                enemy.stopAnimation();
+            }
+        });
+        if (Array.isArray(this.bottles)) {
+            this.bottles.forEach(bottle => {
+                if (typeof bottle.stopAnimation === 'function') {
+                    bottle.stopAnimation();
+                }
+            });
+        }
+        if (Array.isArray(this.coins)) {
+            this.coins.forEach(coin => {
+                if (typeof coin.stopAnimation === 'function') {
+                    coin.stopAnimation();
+                }
+            });
+        }
+        this.throwableObjects.forEach(obj => {
+            if (obj instanceof ThrowableObject) {
+                obj.stopAllIntervals();
+            }
+        });
+        if (this.gameLoopId) {
+            clearInterval(this.gameLoopId);
+            this.gameLoopId = null;
+        }
     }
 
     setWorld() {
         this.character.world = this;
     }
 
+    checkEndbossAlert() {
+        if (this.character.x > 500 && !this.endbossAlerted) {
+            this.level.enemies.forEach(enemy => {
+                if (enemy instanceof Endboss) {
+                    enemy.world = this; 
+                    enemy.becomeAlert();
+                }
+            });
+            this.endbossAlerted = true;
+        }
+    }
+    
     run() {
-        setInterval(() => {
+        this.gameLoopId = setInterval(() => {
             this.checkCollisions();
             this.checkThrowObjects();
             this.checkCoinCollisions();
-            this.checkBottleCollisions(); 
-        }, 200);
+            this.checkBottlePickup();
+            this.checkBottleHits();
+            this.checkEndbossAlert();
+            this.checkGameState();
+        }, 1000 / 60);
+    }
+     
+    checkGameState() {
+        if (this.isGameOver) return;
+        if (this.character.energy <= 0) {
+            this.gameOver('Game Over - Du hast verloren!', false);
+        } else if (this.level.enemies.some(enemy => enemy instanceof Endboss && enemy.energy <= 0)) {
+            this.gameOver('Gratulation! Du hast gewonnen!', true);
+        }
+    }
+    
+    checkBottleHits() {
+        for (let i = this.throwableObjects.length - 1; i >= 0; i--) {
+            const bottle = this.throwableObjects[i];
+            for (const enemy of this.level.enemies) {
+                if (enemy instanceof Endboss && this.isColliding(bottle, enemy)) {
+                    enemy.hit();
+                    bottle.splash();
+                    this.throwableObjects.splice(i, 1);
+                    this.updateEndbossStatusBar();
+                    
+                    let damageSound = new Audio('audio/alarm.mp3');
+                    damageSound.volume = 0.9;
+                    damageSound.play();
+                    break;
+                }
+            }
+        }
+    }
+
+    checkBottlePickup() {
+        this.bottles.forEach((bottle, index) => {
+            if (this.character.isColliding(bottle)) {
+                this.bottles.splice(index, 1);
+                this.statusBarBottles.addBottle();
+                
+                let bottleSound = new Audio('audio/bottle.mp3');
+                bottleSound.play();
+            }
+        });
+    }
+    
+    updateEndbossStatusBar() {
+        if (this.level.enemies.some(enemy => enemy instanceof Endboss)) {
+            const endboss = this.level.enemies.find(enemy => enemy instanceof Endboss);
+            const percentage = (endboss.energy / endboss.INITIAL_ENERGY) * 100;
+            this.statusBarEndboss.setPercentage(percentage);
+        }
     }
 
     createCoins() {
-        let coins = [];
-        for (let i = 0; i < 10; i++) { 
-            let coin = new Coins(); 
-            coins.push(coin);
-        }
-        return coins;
+        return this.createObjectPool(Coins, 10);
     }
-
+    
     createBottles() {
-        let bottles = []; 
-        for (let i = 0; i < 5; i++) { 
-            let bottle = new Bottles(); 
-            bottles.push(bottle); 
+        return this.createObjectPool(Bottles, 5);
+    }
+    
+    createObjectPool(ObjectClass, count) {
+        const pool = [];
+        for (let i = 0; i < count; i++) {
+            const obj = new ObjectClass();
+            obj.active = false;
+            pool.push(obj);
         }
-        return bottles;
+        return pool;
+    }
+    
+    getObjectFromPool(pool) {
+        return pool.find(obj => !obj.active);
+    }
+    
+    returnObjectToPool(obj) {
+        obj.active = false;
+        obj.reset();
     }
     
     checkThrowObjects() {
-        if (this.keyboard.D && this.statusBarBottles.bottleCount > 0) {
+        const currentTime = new Date().getTime();
+        if (this.keyboard.D && 
+            this.statusBarBottles.bottleCount > 0 && 
+            currentTime - this.lastThrowTime > this.throwCooldown) {
+            
             let bottle = new ThrowableObject(this.character.x + 100, this.character.y + 100);
             this.throwableObjects.push(bottle);
             this.statusBarBottles.bottleCount--;
             this.statusBarBottles.setPercentage(this.statusBarBottles.bottleCount * 20);
+            
+            this.lastThrowTime = currentTime;
         }
     }
 
     checkCollisions() {
-        this.level.enemies.forEach((enemy) => {
-            if (this.character.isColliding(enemy)) {
+        this.level.enemies.forEach((enemy, index) => {
+            if (enemy instanceof Chicken) {
+                if (this.character.isJumpingOn(enemy)) {
+                    enemy.die();
+                    this.playChickenDeathSound();
+                    this.level.enemies.splice(index, 1);
+                } else if (this.isColliding(this.character, enemy)) {
+                    this.character.hit();
+                    this.statusBar.setPercentage(this.character.energy);
+                }
+            } else if (enemy instanceof Endboss && this.isColliding(this.character, enemy)) {
                 this.character.hit();
                 this.statusBar.setPercentage(this.character.energy);
-                console.log('Collision with Charakter, energy ', this.character.energy);
             }
         });
-    }    
+    
+        this.throwableObjects.forEach((bottle, bottleIndex) => {
+            this.level.enemies.forEach((enemy) => {
+                if (enemy instanceof Endboss && bottle.isColliding(enemy)) {
+                    enemy.hit();
+                    this.throwableObjects.splice(bottleIndex, 1);
+                    
+                    if (enemy.isDead()) {
+                        this.character.gameOver('Win', true);
+                    }
+                }
+            });
+        });
+    }
+    
+    playChickenDeathSound() {
+        let chickenDeathSound = new Audio('audio/chickenDeathSound.mp3');
+        chickenDeathSound.play();
+        chickenDeathSound.loop = false;
+        chickenDeathSound.volume = 0.3;
+    }
 
-    checkBottleCollisions() {
-        this.bottles.forEach((bottle, index) => {
-            if (this.character.isColliding(bottle)) {
-                this.bottles.splice(index, 1); 
-                this.statusBarBottles.addBottle(); 
-            }
-        });
+    isColliding(obj1, obj2) {
+        return (
+            obj1.x + obj1.width > obj2.x &&
+            obj1.y + obj1.height > obj2.y &&
+            obj1.x < obj2.x + obj2.width &&
+            obj1.y < obj2.y + obj2.height
+        );
+    }
+
+    stopGameLoop() {
+        if (this.gameLoopId) {
+            clearInterval(this.gameLoopId);
+            this.gameLoopId = null;
+        }
     }
 
     update() {
-        console.log('Updating game state, isGameOver:', this.isGameOver);
         if (this.isGameOver) {
-            console.log('Game is over, drawing game over screen.');
-            this.drawGameOverScreen();
             this.stopGameLoop();
-        } else {
-
-            if (Array.isArray(this.bottles)) {
-                this.bottles.forEach(bottle => {
-                    bottle.playAnimation(bottle.IMAGES_BOTTLES);
-                });
+            return;
+        }
+    
+        this.checkCollisions();
+        this.checkThrowObjects();
+        this.checkCoinCollisions();
+        this.checkBottlePickup();
+        this.checkBottleHits();
+        this.checkEndbossAlert();
+        this.checkGameState();
+    
+        this.updateAnimations(this.bottles, 'IMAGES_BOTTLES');
+        this.updateAnimations(this.coins, 'IMAGES_COINS');
+        this.updateEndbossAnimation();
+    
+        this.draw();
+    }
+    
+    updateAnimations(objects, imagesKey) {
+        objects.forEach(obj => {
+            if (obj.active) {
+                obj.playAnimation(obj[imagesKey]);
             }
-            if (Array.isArray(this.coins)) {
-                this.coins.forEach(coin => {
-                    coin.playAnimation(coin.IMAGES_COINS);
-                });
-            }
+        });
+    }
+    
+    updateEndbossAnimation() {
+        const endboss = this.level.enemies.find(enemy => enemy instanceof Endboss);
+        if (endboss) {
+            endboss.playAnimation(endboss.getCurrentAnimationImages());
         }
     }
 
+    gameOver(message = 'Spiel ist vorbei!', isWin = false) {
+        if (this.isGameOver) return;
+        this.isGameOver = true;
+        this.isWin = isWin;
+        this.stopAnimationLoop();
+        setTimeout(() => {
+          this.draw();
+          this.stopAllAnimations();
+          document.getElementById('restartButton').style.display = 'block';
+        }, 50);
+      }
+
     draw() {
-        if (this.isGameOver) {
-            this.drawGameOverScreen();
-            return;
-        }
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     
+        this.ctx.save();
         this.ctx.translate(this.camera_x, 0);
-
+    
         this.addObjectsToMap(this.level.backgroundObjects);
         this.addObjectsToMap(this.level.clouds);
-
-        this.ctx.translate(-this.camera_x, 0);
+        this.addObjectsToMap(this.bottles);
+        this.addToMap(this.character);
+        this.addObjectsToMap(this.level.enemies);
+        this.addObjectsToMap(this.throwableObjects);
+    
+        this.ctx.restore();
+    
         this.addToMap(this.statusBar);
         this.addToMap(this.statusBarBottles);
         this.addToMap(this.statusBarCoins);
         this.addToMap(this.statusBarEndboss);
-        this.ctx.translate(this.camera_x, 0);
-        
+    
         if (this.coins) {
-            this.coins.forEach(coin => {
-                coin.drawImage(this.ctx);
-            });
+            this.coins.forEach(coin => coin.drawImage(this.ctx));
         }
+    
+        if (this.isGameOver) {
+            this.isWin ? this.drawWinScreen() : this.drawGameOverScreen();
+        } else {
+            requestAnimationFrame(() => this.draw());
+        }
+    }
 
-        this.addObjectsToMap(this.bottles);
-        this.addToMap(this.character);
-        this.addObjectsToMap(this.level.enemies);
-        this.addObjectsToMap(this.throwableObjects);        
-        this.ctx.translate(-this.camera_x, 0);
-
-        let self = this;
-        requestAnimationFrame(() => {
-            self.draw();
-        });   
+    drawGameOverScreen() {
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
+        const imgWidth = canvas.width * 0.6;  
+        const imgHeight = canvas.height * 0.4;  
+        const imgX = (canvas.width - imgWidth) / 2;
+        const imgY = (canvas.height - imgHeight) / 2;
+        
+        ctx.globalAlpha = 0.8;  
+        ctx.drawImage(this.gameOverImage, imgX, imgY, imgWidth, imgHeight);
+        ctx.globalAlpha = 1.0;  
+    }
+    
+    drawWinScreen() {
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
+        const imgWidth = canvas.width * 0.6; 
+        const imgHeight = canvas.height * 0.4; 
+        const imgX = (canvas.width - imgWidth) / 2;
+        const imgY = (canvas.height - imgHeight) / 2;
+        
+        ctx.globalAlpha = 0.8; 
+        ctx.drawImage(this.winImage, imgX, imgY, imgWidth, imgHeight);
+        ctx.globalAlpha = 1.0; 
     }
 
     checkCoinCollisions() {
         this.coins.forEach((coin, index) => {
             if (this.character.isColliding(coin)) {
-                this.coins.splice(index, 1); 
+                this.coins.splice(index, 1);
                 this.score += 10;
-                this.statusBarCoins.addCoin(); 
-                console.log('Coin collected! Current score:', this.score);
+                this.statusBarCoins.addCoin();
+                
+                let coinSound = new Audio('audio/coin.mp3');
+                coinSound.play();
             }
         });
     }
@@ -169,53 +439,34 @@ class World {
         });
     }
 
-    addToMap(mo) { // mo: moveable object
+    addToMap(mo) { 
         if(mo.otherDirection) {
             this.flipImage(mo);
         }
 
         mo.drawImage(this.ctx);
-        mo.drawFrame(this.ctx);
 
         if(mo.otherDirection) {
             this.flipImageBack(mo);
         }
     }
-
-    gameOver() {
-        console.log('Game over triggered in World');
-        this.isGameOver = true;
-        this.character.stopAllAnimations();
-        this.stopAllIntervals();
-        this.drawGameOverScreen();
-    }
-    
-    drawGameOverScreen() {
-        console.log('Drawing game over screen');
-        if (!this.ctx) {
-            console.error('Canvas context not found');
-            return;
-        }
-        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-        if (this.gameOverImageLoaded) {
-            this.ctx.drawImage(this.gameOverImage, 0, 0, this.canvas.width, this.canvas.height);
-            console.log('Game over image drawn');
-        } else {
-            console.error("Game over image not loaded, using fallback");
-            this.ctx.fillStyle = 'black';
-            this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-            this.ctx.fillStyle = 'white';
-            this.ctx.font = '48px Arial';
-            this.ctx.textAlign = 'center';
-            this.ctx.fillText('GAME OVER', this.canvas.width / 2, this.canvas.height / 2);
-        }
-    }
-
+ 
     stopAllIntervals() {
         clearInterval(this.gameLoopId);
-        
+        this.character.stopAllAnimations();
+        this.level.enemies.forEach(enemy => {
+            if (enemy instanceof MoveableObject) {
+                enemy.stopAllIntervals();
+            }
+        });
+        this.bottles.forEach(bottle => {
+            bottle.stopAnimation();
+        });
+        this.coins.forEach(coin => {
+            coin.stopAnimation();
+        });
     }
-
+    
     flipImage(mo) {
         this.ctx.save();
         this.ctx.translate(mo.width, 0);

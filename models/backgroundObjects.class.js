@@ -10,7 +10,6 @@ class BackgroundObject extends MoveableObject  {
         
     }
 
-    // add background-image
     draw() {
         this.context.drawImage(this.img, this.x, this.y, this.width, this.height);
     }
