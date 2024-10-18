@@ -267,12 +267,15 @@ class World {
                     this.character.hit();
                     this.statusBar.setPercentage(this.character.energy);
                 }
-            } else if (enemy instanceof Endboss && this.character.isColliding(enemy)) {
-                this.character.hit();
-                this.statusBar.setPercentage(this.character.energy);
+            } else if (enemy instanceof Endboss) {
+                if (this.character.isColliding(enemy)) {
+                    this.character.hit();
+                    this.statusBar.setPercentage(this.character.energy);
+                }
             }
         });
     
+        // Überprüfen Sie Kollisionen mit Flaschen
         this.throwableObjects.forEach((bottle, bottleIndex) => {
             this.level.enemies.forEach((enemy) => {
                 if (enemy instanceof Endboss && bottle.isColliding(enemy)) {

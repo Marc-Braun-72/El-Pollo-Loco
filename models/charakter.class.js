@@ -74,6 +74,7 @@ class Character extends MoveableObject {
     isGameOver = false; 
     jumpForce = -20;
     gravity = 1;
+    isBouncing = false;
 
     constructor() {
         super().loadImage('./images/2_character_pepe/2_walk/W-21.png');
@@ -173,8 +174,14 @@ class Character extends MoveableObject {
     }
 
     bounce() {
-        this.speedY = -15;  // Negative Geschwindigkeit für Aufwärtsbewegung
-        this.isJumping = true;  // Setze isJumping auf true, um weitere Sprünge zu verhindern
+        if (!this.isBouncing) {
+            this.speedY = -20;  // Erhöht für einen höheren Bounce
+            this.isJumping = true;
+            this.isBouncing = true;
+            setTimeout(() => {
+                this.isBouncing = false;
+            }, 500);  // 500ms Verzögerung, bevor ein neuer Bounce möglich ist
+        }
     }
 
     hit() {
@@ -306,7 +313,7 @@ class Character extends MoveableObject {
                 this.y += this.speedY;
                 this.speedY += this.accelleration;
             } else {
-                this.y = 180; // Setze auf Bodenhöhe
+                this.y = 180; 
                 this.speedY = 0;
                 this.isJumping = false;
             }
@@ -412,13 +419,13 @@ class Character extends MoveableObject {
     
     jump() {
         if (!this.isJumping && this.isOnGround()) {
-            this.speedY = -25; // Negative Werte für Aufwärtsbewegung
+            this.speedY = -25; 
             this.isJumping = true;
             this.jump_sound.play();
         }
     }
 
     isOnGround() {
-        return this.y >= 180; // Angenommen, 180 ist die Bodenhöhe
+        return this.y >= 180; 
     }
 }
