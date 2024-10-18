@@ -256,15 +256,18 @@ class World {
     checkCollisions() {
         this.level.enemies.forEach((enemy, index) => {
             if (enemy instanceof Chicken) {
-                if (this.character.isJumpingOn(enemy)) {
+                if (this.character.isFallingOn(enemy)) {
                     enemy.die();
                     this.playChickenDeathSound();
-                    this.level.enemies.splice(index, 1);
-                } else if (this.isColliding(this.character, enemy)) {
+                    this.character.bounce();
+                    setTimeout(() => {
+                        this.level.enemies.splice(index, 1);
+                    }, 200);
+                } else if (this.character.isColliding(enemy)) {
                     this.character.hit();
                     this.statusBar.setPercentage(this.character.energy);
                 }
-            } else if (enemy instanceof Endboss && this.isColliding(this.character, enemy)) {
+            } else if (enemy instanceof Endboss && this.character.isColliding(enemy)) {
                 this.character.hit();
                 this.statusBar.setPercentage(this.character.energy);
             }

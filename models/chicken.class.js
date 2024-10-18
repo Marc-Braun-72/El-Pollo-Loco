@@ -22,7 +22,7 @@ class Chicken extends MoveableObject {
 
         this.x = 200 + Math.random() * 2000;
         this.speed = 0.5 + Math.random() * 0.25;
-
+        this.energy = 1;
         this.animate();
     }
 
@@ -44,8 +44,10 @@ class Chicken extends MoveableObject {
     }
 
     die() {
+        this.energy = 0;
         this.speed = 0;
-        this.playAnimation(this.IMAGES_DEAD);
+        this.stopAnimation();
+        this.loadImage(this.IMAGES_DEAD[0]);
         setTimeout(() => {
             this.y = 1000; 
         }, 500);

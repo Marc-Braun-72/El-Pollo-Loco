@@ -72,6 +72,8 @@ class Character extends MoveableObject {
     accelleration = 2.5;
     energy = 100; 
     isGameOver = false; 
+    jumpForce = -20;
+    gravity = 1;
 
     constructor() {
         super().loadImage('./images/2_character_pepe/2_walk/W-21.png');
@@ -151,28 +153,29 @@ class Character extends MoveableObject {
 
     checkCollisions() {
         this.level.enemies.forEach((enemy, index) => {
-            if (enemy instanceof Chicken) {
-                if (this.character.isColliding(enemy)) {
-                    if (this.character.isFallingOn(enemy)) {
-                        enemy.die();  
-                        this.playChickenDeathSound();
-                        setTimeout(() => {
-                            this.level.enemies.splice(index, 1); 
-                        }, 500);
-                    } else {
-                        this.character.hit();  
-                        this.statusBar.setPercentage(this.character.energy); 
-                    }
+            if (this.character.isColliding(enemy)) {
+                if (this.character.isFallingOn(enemy)) {
+                    enemy.hit();
+                    this.character.bounce();
+                } else {
+                    this.character.hit();
                 }
             }
         });
     }
 
     isFallingOn(mo) {
-    return this.speedY < 0 &&  
-           this.y + this.height - this.offset.bottom < mo.y + mo.height &&  
-           this.y + this.height - this.offset.bottom > mo.y;  
-    }   
+        return this.speedY > 0 &&  // Charakter fällt nach unten
+               this.y + this.height - this.offset.bottom < mo.y + mo.offset.top &&  // Füße des Charakters sind über dem Kopf des Gegners
+               this.y + this.height > mo.y &&  // Aber der Charakter ist nicht komplett über dem Gegner
+               this.x + this.width > mo.x + mo.offset.left &&  // Horizontale Überlappung
+               this.x < mo.x + mo.width - mo.offset.right;
+    }
+
+    bounce() {
+        this.speedY = -15;  // Negative Geschwindigkeit für Aufwärtsbewegung
+        this.isJumping = true;  // Setze isJumping auf true, um weitere Sprünge zu verhindern
+    }
 
     hit() {
         this.energy -= 2; 
@@ -298,17 +301,21 @@ class Character extends MoveableObject {
     }
 
     applyGravity() {
-        this.gravityIntervalId = setInterval(() => { 
-            if (!this.isGameOver && this.isAboveGround()) {
-                this.y -= this.speedY;
-                this.y -= this.accelleration;
+        setInterval(() => {
+            if (!this.isOnGround() || this.speedY < 0) {
+                this.y += this.speedY;
+                this.speedY += this.accelleration;
+            } else {
+                this.y = 180; // Setze auf Bodenhöhe
+                this.speedY = 0;
+                this.isJumping = false;
             }
         }, 1000 / 60);
     }
 
     isAboveGround() {
         return this.y < 180;
-    }   
+    }
 
     loadImages(arr) { 
         arr.forEach((path) => {
@@ -352,8 +359,6 @@ class Character extends MoveableObject {
             this.world.camera_x = -this.x + 100;
     
             if (this.world.keyboard.SPACE && !this.isJumping) {
-                this.isJumping = true;
-                this.jump_sound.play();
                 this.jump();
                 this.inactivityTime = 0;
             } else {
@@ -383,27 +388,37 @@ class Character extends MoveableObject {
         this.animationIntervals.push(animationInterval);  
     }
     
-     jump() {
-        let jumpHeight = 180; 
-        let jumpDuration = 800; 
-        let jumpSteps = 20; 
-        let stepHeight = jumpHeight / jumpSteps;
-        let stepDuration = jumpDuration / (jumpSteps * 3); 
+    moveRight() {
+        this.x += this.speed;
+        this.otherDirection = false;
+        this.walking_sound.play();
+    }
+    
+    moveLeft() {
+        this.x -= this.speed;
+        this.otherDirection = true;
+        this.walking_sound.play();
+    }
+    
+    startJump() {
+        this.isJumping = true;
+        this.jump_sound.play();
+        this.jump();
+    }
+    
+    isMoving() {
+        return this.world.keyboard.RIGHT || this.world.keyboard.LEFT;
+    }
+    
+    jump() {
+        if (!this.isJumping && this.isOnGround()) {
+            this.speedY = -25; // Negative Werte für Aufwärtsbewegung
+            this.isJumping = true;
+            this.jump_sound.play();
+        }
+    }
 
-        let upInterval = setInterval(() => {
-            this.y -= stepHeight;
-            if (this.y <= this.originalY - jumpHeight) {
-                clearInterval(upInterval);
-                let downInterval = setInterval(() => {
-                    this.y += stepHeight;
-                    if (this.y >= this.originalY) {
-                        clearInterval(downInterval);
-                        this.isJumping = false;
-                        this.y = this.originalY; 
-                        this.img = this.imageCache[this.IMAGES_WALKING[0]];  
-                    }
-                }, stepDuration);
-            }
-        }, stepDuration);
+    isOnGround() {
+        return this.y >= 180; // Angenommen, 180 ist die Bodenhöhe
     }
 }
