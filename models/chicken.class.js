@@ -1,4 +1,5 @@
 class Chicken extends MoveableObject {
+    isDying = false;
     y = 350;
     width = 70;
     height = 70;
@@ -45,12 +46,15 @@ class Chicken extends MoveableObject {
     }
 
     die() {
-        this.energy = 0;
-        this.speed = 0;
-        this.stopAnimation();
-        this.loadImage(this.IMAGES_DEAD[0]);
-        setTimeout(() => {
-            this.y = 1000; 
-        }, 500);
-    }
+        if (!this.isDying) {
+            this.isDying = true;
+            this.energy = 0;
+            this.speed = 0;
+            this.stopAnimation();
+            this.loadImage(this.IMAGES_DEAD[0]);
+            setTimeout(() => {
+                this.y = 1000; 
+            }, 500);
+        }
+    } 
 }
