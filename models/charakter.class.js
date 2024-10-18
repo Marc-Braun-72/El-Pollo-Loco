@@ -75,6 +75,7 @@ class Character extends MoveableObject {
     jumpForce = -20;
     gravity = 1;
     isBouncing = false;
+    canBounce = true;
 
     constructor() {
         super().loadImage('./images/2_character_pepe/2_walk/W-21.png');
@@ -166,21 +167,21 @@ class Character extends MoveableObject {
     }
 
     isFallingOn(mo) {
-        return this.speedY > 0 &&  // Charakter fällt nach unten
-               this.y + this.height - this.offset.bottom < mo.y + mo.offset.top &&  // Füße des Charakters sind über dem Kopf des Gegners
-               this.y + this.height > mo.y &&  // Aber der Charakter ist nicht komplett über dem Gegner
-               this.x + this.width > mo.x + mo.offset.left &&  // Horizontale Überlappung
+        return this.speedY > 0 &&  
+               this.y + this.height - this.offset.bottom < mo.y + mo.offset.top &&  
+               this.y + this.height > mo.y &&  
+               this.x + this.width > mo.x + mo.offset.left && 
                this.x < mo.x + mo.width - mo.offset.right;
     }
 
     bounce() {
-        if (!this.isBouncing) {
-            this.speedY = -20;  // Erhöht für einen höheren Bounce
+        if (this.canBounce) {
+            this.speedY = -15;
             this.isJumping = true;
-            this.isBouncing = true;
+            this.canBounce = false;
             setTimeout(() => {
-                this.isBouncing = false;
-            }, 500);  // 500ms Verzögerung, bevor ein neuer Bounce möglich ist
+                this.canBounce = true;
+            }, 1000); 
         }
     }
 
@@ -316,6 +317,7 @@ class Character extends MoveableObject {
                 this.y = 180; 
                 this.speedY = 0;
                 this.isJumping = false;
+                this.canBounce = true; 
             }
         }, 1000 / 60);
     }
