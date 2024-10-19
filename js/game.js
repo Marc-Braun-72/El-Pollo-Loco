@@ -133,3 +133,18 @@ window.addEventListener('keyup', (e) => {
         keyboard.D = false;
     }
 });
+
+function checkOrientation() {
+    if (window.innerHeight > window.innerWidth) {
+
+      document.getElementById('landscape-warning').classList.add('visible');
+    } else {
+
+      document.getElementById('landscape-warning').classList.remove('visible');
+    }
+  }
+
+  window.addEventListener('resize', checkOrientation);
+  
+  checkOrientation();
+  
