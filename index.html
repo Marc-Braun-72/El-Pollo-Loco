@@ -32,9 +32,20 @@
     <div id="landscape-warning">
         <div class="warning-content">
           <p>Bitte das Gerät drehen, um im Landscape-Modus zu spielen!</p>
-          <!-- <img src="" alt="Drehe das Gerät"> -->
         </div>
-      </div>
+    </div>
+      
+    <div id="buttons-container" style="display: none;">
+        <button id="overlay-button">Overlay anzeigen</button>
+        <button id="script-button">Script starten</button>
+    </div>
+      
+    <div id="overlay" style="display: none;">
+        <div id="overlay-content">
+          <p>Dies ist das Overlay-Inhalt.</p>
+          <button id="close-overlay">Schließen</button>
+        </div>
+    </div>
       
       
 
@@ -88,7 +99,7 @@
     
     <script src="js/game.js"></script>
 
-    <script>
+    <!-- <script>
       document.addEventListener('DOMContentLoaded', (event) => {
           const fullscreenButton = document.getElementById('fullscreenButton');
           const canvas = document.getElementById('canvas');
@@ -117,7 +128,7 @@
               }
           });
       });
-    </script>
+    </script> -->
 
 </body>
 </html>

@@ -134,17 +134,43 @@ window.addEventListener('keyup', (e) => {
     }
 });
 
-function checkOrientation() {
-    if (window.innerHeight > window.innerWidth) {
-
+function isMobileDevice() {
+    return (window.innerWidth <= 768); // Prüft auf typische mobile Bildschirmgröße (max. 768px Breite)
+  }
+  
+  function checkOrientation() {
+    if (isMobileDevice() && window.innerHeight > window.innerWidth) {
+      // Gerät ist ein Mobilgerät und im Portrait-Modus
       document.getElementById('landscape-warning').classList.add('visible');
+      document.getElementById('buttons-container').style.display = 'none'; // Buttons ausblenden
     } else {
-
+      // Entweder kein Mobilgerät oder im Landscape-Modus
       document.getElementById('landscape-warning').classList.remove('visible');
+      document.getElementById('buttons-container').style.display = 'block'; // Buttons anzeigen
     }
   }
-
+  
+  // Event Listener für das Ändern der Ausrichtung
   window.addEventListener('resize', checkOrientation);
   
+  // Initialer Check beim Laden der Seite
   checkOrientation();
+  
+  
+  
+  // Overlay Button Logik
+  document.getElementById('overlay-button').addEventListener('click', function() {
+    document.getElementById('overlay').style.display = 'flex'; // Overlay anzeigen
+  });
+  
+  document.getElementById('close-overlay').addEventListener('click', function() {
+    document.getElementById('overlay').style.display = 'none'; // Overlay schließen
+  });
+  
+  // Script Button Logik
+  document.getElementById('script-button').addEventListener('click', function() {
+    // Hier kommt dein Skript hin
+    alert("Script wird gestartet!");
+  });
+  
   
