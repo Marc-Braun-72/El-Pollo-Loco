@@ -10,7 +10,6 @@
     <link rel="apple-touch-icon" sizes="180x180" href="./favicon/apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="./favicon/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="./favicon/favicon-16x16.png">
-    <link rel="manifest" href="./favicon/site.webmanifest">
     <link rel="shortcut icon" href="./favicon/favicon.ico">
 
     <!-- font 'Rye' -->
@@ -20,62 +19,24 @@
 <body onload="init()">
 
   <h1>El pollo loco</h1>
-  <div class="gameContainer">
-      <canvas id="canvas" width="720px" height="480px"></canvas>
+    <div class="gameContainer">
+        <canvas id="canvas" width="720px" height="480px"></canvas>
 
-      <div id="startScreen" class="overlay">
-        <img src="images/9_intro_outro_screens/start/startscreen_1.png" alt="Start Screen" class="start-image">
-        <button id="startButton" onclick="startGame()">Start Game</button>
-      </div>
-    <button id="restartButton" onclick="restartGame()" style="display: none;">Restart Game</button>
+            <div id="startScreen" class="overlay">
+                <img src="images/9_intro_outro_screens/start/startscreen_1.png" alt="Start Screen" class="start-image">
+                <button id="startButton" onclick="startGame()">Start Game</button>
+            </div>
+            <button id="restartButton" onclick="restartGame()" style="display: none;">Restart Game</button>
 
-    <div id="landscape-warning">
-        <div class="warning-content">
-          <p>Bitte das Gerät drehen, um im Landscape-Modus zu spielen!</p>
+    </div>
+
+    <div id='rotateDevice' class='rotate-device'>
+        <div class='rotate-device-content'>
+            <h2>Bitte drehen Sie Ihr Gerät!</h2>
+            <div class='rotate-arrow'></div>
+            <p>Tippen Sie hier, um fortzufahren</p>
         </div>
     </div>
-      
-    <div id="buttons-container" style="display: none;">
-        <button id="overlay-button">Overlay anzeigen</button>
-        <button id="script-button">Script starten</button>
-    </div>
-      
-    <div id="overlay" style="display: none;">
-        <div id="overlay-content">
-          <p>Dies ist das Overlay-Inhalt.</p>
-          <button id="close-overlay">Schließen</button>
-        </div>
-    </div>
-      
-      
-
-      <!-- <div class="controls">
-        <div class="item">
-            <div class="chevron arrows">
-                <span class="arrows">←→</span>
-            </div>
-            <span class="control-text">Walk L/R</span>
-        </div>
-        <div class="item">
-            <div class="space-bar">
-                <span>Space</span>
-            </div>
-            <span class="control-text">Jump</span>
-        </div>
-        <div class="item">
-            <div class="chevron">
-                <span>D</span>
-            </div>
-            <span class="control-text">Throw Bottle</span>
-        </div>
-        <div class="item">
-            <div class="chevron arrows">
-              <span id="fullscreenButton" class="fullscreen-icon"></span>
-            </div>
-            <span class="control-text">Fullscreen</span>
-        </div>
-    </div> -->
-  </div>
     
     <script src="models/drawable-object.class.js"></script>
     <script src="models/moveable-objects.class.js"></script>
@@ -98,37 +59,7 @@
     <script src="levels/level_1.js"></script>
     
     <script src="js/game.js"></script>
-
-    <!-- <script>
-      document.addEventListener('DOMContentLoaded', (event) => {
-          const fullscreenButton = document.getElementById('fullscreenButton');
-          const canvas = document.getElementById('canvas');
-
-          fullscreenButton.addEventListener('click', () => {
-              if (!document.fullscreenElement) {
-                  if (canvas.requestFullscreen) {
-                      canvas.requestFullscreen();
-                  } else if (canvas.mozRequestFullScreen) { 
-                      canvas.mozRequestFullScreen();
-                  } else if (canvas.webkitRequestFullscreen) { 
-                      canvas.webkitRequestFullscreen();
-                  } else if (canvas.msRequestFullscreen) { 
-                      canvas.msRequestFullscreen();
-                  }
-              } else {
-                  if (document.exitFullscreen) {
-                      document.exitFullscreen();
-                  } else if (document.mozCancelFullScreen) {
-                      document.mozCancelFullScreen();
-                  } else if (document.webkitExitFullscreen) {
-                      document.webkitExitFullscreen();
-                  } else if (document.msExitFullscreen) {
-                      document.msExitFullscreen();
-                  }
-              }
-          });
-      });
-    </script> -->
+    <script src="orientation.js"></script>
 
 </body>
 </html>
