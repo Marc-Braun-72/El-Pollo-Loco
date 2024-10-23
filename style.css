@@ -307,7 +307,7 @@ canvas {
 }
 
 .control-buttons {
-    display: none;
+    /* display: none; */
     position: absolute;
     right: 20px;
     display: flex;
