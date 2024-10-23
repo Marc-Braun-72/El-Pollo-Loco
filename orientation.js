@@ -2,7 +2,7 @@
 let isRotateDeviceVisible = false;
 
 function checkOrientation() {
-    const rotateDevice = document.getElementById('rotateDevice');
+    let rotateDevice = document.getElementById('rotateDevice');
     if (window.innerHeight > window.innerWidth) {
         rotateDevice.style.display = 'flex';
         isRotateDeviceVisible = true;
@@ -28,39 +28,33 @@ window.addEventListener('load', () => {
 
 // Controls für Touch-Devices
 document.addEventListener('DOMContentLoaded', () => {
-    const leftButton = document.getElementById('leftButton');
-    const rightButton = document.getElementById('rightButton');
-    const jumpButton = document.getElementById('jumpButton');
-    const throwButton = document.getElementById('throwButton');
+    let leftButton = document.getElementById('leftButton');
+    let rightButton = document.getElementById('rightButton');
+    let jumpButton = document.getElementById('jumpButton');
+    let throwButton = document.getElementById('throwButton');
 
 
     leftButton.addEventListener('touchend', (e) => {
         e.stopPropagation();
+        e.preventDefault();
         keyboard.LEFT = false;
     });
 
     leftButton.addEventListener('touchstart', (e) => {
         e.stopPropagation();
+        e.preventDefault();
         keyboard.LEFT = true;
     });
 
-    // document.getElementById('leftButton').addEventListener('touchstart', (e) => {
-    //     e.preventDefault();
-    //     keyboard.TOUCH_LEFT = true;
-    // });
-    // document.getElementById('leftButton').addEventListener('touchend', (e) => {
-    //     e.preventDefault();
-    //     keyboard.TOUCH_LEFT = false;
-    // });
-    
-
     rightButton.addEventListener('touchstart', (e) => {
         e.stopPropagation();
+        e.preventDefault();
         keyboard.RIGHT = true;
     });
 
     rightButton.addEventListener('touchend', (e) => {
         e.stopPropagation();
+        e.preventDefault();
         keyboard.RIGHT = false;
     });
 
@@ -86,12 +80,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 // Control-Button
-// let isMuted = false; // Startet standardmäßig ohne Ton
-
 document.addEventListener('DOMContentLoaded', () => {
-    const fullscreenButton = document.getElementById('fullscreenButton');
-    const soundButton = document.getElementById('soundButton');
-    const restartButtonMobile = document.getElementById('restartButton-mobile');
+    let fullscreenButton = document.getElementById('fullscreenButton');
+    let soundButton = document.getElementById('soundButton');
+    let restartButtonMobile = document.getElementById('restartButton-mobile');
 
     fullscreenButton.addEventListener('click', toggleFullscreen);
     soundButton.addEventListener('click', toggleSound);
@@ -115,10 +107,6 @@ document.addEventListener('DOMContentLoaded', () => {
         backgroundMusic.play().catch(error => {
             console.error('Fehler beim Abspielen der Musik:', error);
         });
-    }
-
-    function restartGame() {
-        // Deine Logik für den Neustart des Spiels
     }
 });
 

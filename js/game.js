@@ -24,10 +24,10 @@ function startBackgroundMusic() {
 function toggleSound() {
     isMuted = !isMuted;
     if (isMuted) {
-        backgroundMusic.pause(); // Musik pausieren
+        backgroundMusic.pause(); 
         document.getElementById('soundButton').classList.add('muted');
     } else {
-        startBackgroundMusic(); // Musik abspielen, wenn nicht gemutet
+        startBackgroundMusic(); 
         document.getElementById('soundButton').classList.remove('muted');
     }
 }
@@ -39,6 +39,7 @@ function startGame() {
 
     world = new World(canvas, keyboard);
     world.start();
+    document.getElementById('game-controls').style.display = 'none';
 }
 
 function restartGame() {

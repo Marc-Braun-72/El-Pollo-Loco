@@ -18,11 +18,11 @@
 </head>
 <body onload="init()">
 
-  <h1>El pollo loco</h1>
+  <!-- <h1>El pollo loco</h1> -->
     <div class="gameContainer">
         <canvas id="canvas" width="720px" height="480px"></canvas>
 
-        <div class="control-buttons">
+        <div id="control-buttons" class="control-buttons" style="display: none;">
             <div id="fullscreenButton" class="control-icon fullscreen-icon"></div>
             <div id="soundButton" class="control-icon sound-icon"></div>
             <div id="restartButton-mobile" onclick="restartGame()" class="control-icon restart-icon"></div>
@@ -34,7 +34,7 @@
         </div>
         <button id="restartButton" onclick="restartGame()" style="display: none;">Restart Game</button>
         
-        <div id="buttons-container">
+        <div id="buttons-container" style="display: none;">
             <div class="left-buttons">
                 <button id="leftButton"></button>
                 <button id="rightButton"></button>
@@ -44,13 +44,25 @@
                 <button id="throwButton">↷</button>
             </div>
         </div>
+
     </div>
 
-    <div id='rotateDevice' class='rotate-device'>
-        <div class='rotate-device-content'>
-            <h2>Please turn Your device to play!</h2>
-            <div class='rotate-arrow'></div>
-            <p></p>
+    <div id="game-controls" class="game-controls">
+        <ul>
+            <li><span>⬅️ Left / Right ➡️</span></li>
+            <li><span>Jump ⎵ Space</span></li>
+            <li><span>Throw Bottle D</span> </li>
+        </ul>
+    </div>
+
+    <div class="legal">
+        <a class="legal-link" href="imprint.html">Imprint</a>
+        <a class="legal-link" href="privacy.html">Privacy Policy</a>
+    </div>
+
+    <div id="rotateDevice" class="rotate-device">
+        <div class="rotate-device-content">
+            <h2>Please turn your device to play!</h2>
         </div>
     </div>
     
@@ -76,6 +88,17 @@
     
     <script src="js/game.js"></script>
     <script src="orientation.js"></script>
+
+    <script>
+        function isMobile() {
+            return /iPhone|iPad|iPod|Android|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        }
+    
+        if (isMobile()) {
+            document.getElementById("buttons-container").style.display = "block";
+            document.getElementById("control-buttons").style.display = "block";
+        }
+    </script>
 
 </body>
 </html>
