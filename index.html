@@ -30,7 +30,7 @@
 
         <div id="startScreen" class="overlay">
             <img src="images/9_intro_outro_screens/start/startscreen_1.png" alt="Start Screen" class="start-image">
-            <button id="startButton" onclick="startGame()">Start Game</button>
+            <button id="startButton" onclick="startGame(); startBackgroundMusic();">Start Game</button>
         </div>
         <button id="restartButton" onclick="restartGame()" style="display: none;">Restart Game</button>
         
@@ -55,7 +55,7 @@
         </ul>
     </div>
 
-    <div class="legal">
+    <div id="legal" class="legal">
         <a class="legal-link" href="imprint.html" target="_blank">Imprint</a>
         <a class="legal-link" href="privacy.html" target="_blank">Privacy Policy</a>
     </div>
@@ -98,6 +98,9 @@
             document.getElementById("buttons-container").style.display = "block";
             document.getElementById("control-buttons").style.display = "block";
         }
+
+        document.getElementById('soundButton').addEventListener('click', toggleSound);
+
     </script>
 
 </body>

@@ -190,8 +190,8 @@ canvas {
     margin: 5px;
     font-size: 20px;
     cursor: pointer;
-    width: 30px;
-    height: 30px;
+    width: 40px;
+    height: 40px;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -316,8 +316,8 @@ canvas {
 }
 
 .control-icon {
-    width: 20px;
-    height: 20px;
+    width: 30px;
+    height: 30px;
     cursor: pointer;
     background-color: orange;
     border: 1px solid black;
@@ -458,6 +458,14 @@ canvas {
     border: 1px solid #000000;
     border-radius: 5px;
     box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+@media only screen and (max-width: 740px) {
+    #game-controls ul li {
+        margin: 0 5px;
+        padding: 5px 8px;
+        font-size: 12px;
+    }
 }
 
 .legal {

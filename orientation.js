@@ -59,21 +59,26 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     jumpButton.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
         keyboard.SPACE = true;
     });
 
     jumpButton.addEventListener('touchend', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
         keyboard.SPACE = false;
     });
 
     throwButton.addEventListener('touchstart', (e) => {
-
+        e.preventDefault();
+        e.stopPropagation();
         keyboard.D = true;
     });
 
     throwButton.addEventListener('touchend', (e) => {
-        // e.preventDefault();
-        // e.stopPropagation();
+        e.preventDefault();
+        e.stopPropagation();
         keyboard.D = false;
     });
 });
@@ -98,16 +103,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
     }
-
-    function toggleSound() {
-        checkMute();
-    }
-
-    function startBackgroundMusic() {
-        backgroundMusic.play().catch(error => {
-            console.error('Fehler beim Abspielen der Musik:', error);
-        });
-    }
 });
 
 function checkMute() {
@@ -120,19 +115,65 @@ function checkMute() {
 
 function mute() {
     isMuted = true;
-    backgroundMusic.muted = true;
-    world.character.walking_sound.muted = true;
-    world.character.jump_sound.muted = true;
-    // Fügen Sie hier weitere Sounds hinzu, die Sie stummschalten möchten
+    if (backgroundMusic) {
+        backgroundMusic.muted = true;
+    }
+
+    if (world && world.character) {
+        world.character.walking_sound.muted = true;
+        world.character.jump_sound.muted = true;
+    }
+
+    world.damageSound.muted = true;
+    
+    if (world.throwableObjects) {
+        world.throwableObjects.forEach(bottle => {
+            if (bottle.bottleSound) {
+                bottle.bottleSound.muted = true;
+            }
+        });
+    }
+    
+    if (world.coins) {
+        world.coins.forEach(coin => {
+            if (coin.coinSound) {
+                coin.coinSound.muted = true;
+            }
+        });
+    }
+
     document.getElementById('soundButton').classList.add('muted');
 }
 
+
 function unmute() {
     isMuted = false;
-    backgroundMusic.muted = false;
+    if (backgroundMusic) {
+        backgroundMusic.muted = false;
+    }
+
     if (world && world.character) {
         world.character.walking_sound.muted = false;
         world.character.jump_sound.muted = false;
     }
+
+    world.damageSound.muted = false;
+    
+    if (world.throwableObjects) {
+        world.throwableObjects.forEach(bottle => {
+            if (bottle.bottleSound) {
+                bottle.bottleSound.muted = false;
+            }
+        });
+    }
+    
+    if (world.coins) {
+        world.coins.forEach(coin => {
+            if (coin.coinSound) {
+                coin.coinSound.muted = false;
+            }
+        });
+    }
+
     document.getElementById('soundButton').classList.remove('muted');
 }

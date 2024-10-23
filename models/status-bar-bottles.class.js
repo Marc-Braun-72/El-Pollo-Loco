@@ -3,12 +3,12 @@ class StatusBarBottles extends DrawableObject {
     bottleCount = 0;
 
     IMAGES_BOTTLE = [
-        'images/7_statusbars/1_statusbar/3_statusbar_bottle/orange/0.png', // 0
+        'images/7_statusbars/1_statusbar/3_statusbar_bottle/orange/0.png', 
         'images/7_statusbars/1_statusbar/3_statusbar_bottle/orange/20.png',
         'images/7_statusbars/1_statusbar/3_statusbar_bottle/orange/40.png',
         'images/7_statusbars/1_statusbar/3_statusbar_bottle/orange/60.png',
         'images/7_statusbars/1_statusbar/3_statusbar_bottle/orange/80.png',
-        'images/7_statusbars/1_statusbar/3_statusbar_bottle/orange/100.png' // 5
+        'images/7_statusbars/1_statusbar/3_statusbar_bottle/orange/100.png' 
     ];
 
     percentage = 100;

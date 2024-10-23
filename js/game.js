@@ -3,36 +3,65 @@ let canvas;
 let world;
 let keyboard = new Keyboard();
 let backgroundMusic;
-let isMuted = true;
+let isMuted = false;
 
 function init() {
     canvas = document.getElementById('canvas');
 
-    backgroundMusic = new Audio('audio/la_cucaracha.mp3');
-    backgroundMusic.loop = true;
-    backgroundMusic.volume = 0.5;
+    // backgroundMusic = new Audio('audio/la_cucaracha.mp3');
+    // backgroundMusic.loop = true;
+    // backgroundMusic.volume = 0.5;
 
     document.getElementById('soundButton').addEventListener('click', toggleSound);
 }
 
 function startBackgroundMusic() {
-    backgroundMusic.play().catch(error => {
-        console.error("Fehler beim Abspielen der Hintergrundmusik:", error);
-    });
-}
-
-function toggleSound() {
-    isMuted = !isMuted;
-    if (isMuted) {
-        backgroundMusic.pause(); 
-        document.getElementById('soundButton').classList.add('muted');
+    if (backgroundMusic) {
+        setTimeout(() => {
+            backgroundMusic.play().catch(error => {
+                console.error("Fehler beim Abspielen der Hintergrundmusik:", error);
+            });
+        }, 500);  // 500ms Verzögerung vor dem Abspielen
     } else {
-        startBackgroundMusic(); 
-        document.getElementById('soundButton').classList.remove('muted');
+        console.error("backgroundMusic ist nicht initialisiert.");
     }
 }
 
+
+function toggleSound() {
+    if (!backgroundMusic) {
+        // Wenn backgroundMusic nicht initialisiert ist, initialisieren
+        backgroundMusic = new Audio('audio/la_cucaracha.mp3');
+        backgroundMusic.loop = true;
+        backgroundMusic.volume = 0.5;
+    }
+
+    isMuted = !isMuted;
+    if (isMuted) {
+        backgroundMusic.pause();
+    } else {
+        startBackgroundMusic();
+    }
+
+    // Soundeffekte überprüfen
+    if (world && world.character) {
+        world.character.walking_sound.muted = isMuted;
+        world.character.jump_sound.muted = isMuted;
+        // Hier weitere Effekte stummschalten oder aktivieren
+    }
+
+    document.getElementById('soundButton').classList.toggle('muted', isMuted);
+}
+
+
 function startGame() {
+    if (!backgroundMusic) {
+        backgroundMusic = new Audio('audio/la_cucaracha.mp3');
+        backgroundMusic.loop = true;
+        backgroundMusic.volume = 0.5;
+    }
+
+    startBackgroundMusic();
     initLevel();
     document.getElementById('startScreen').style.display = 'none';
     document.getElementById('restartButton').style.display = 'none';
@@ -40,6 +69,7 @@ function startGame() {
     world = new World(canvas, keyboard);
     world.start();
     document.getElementById('game-controls').style.display = 'none';
+    document.getElementById('legal').style.display = 'none';
 }
 
 function restartGame() {
