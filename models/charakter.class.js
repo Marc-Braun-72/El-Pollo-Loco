@@ -430,4 +430,18 @@ class Character extends MoveableObject {
     isOnGround() {
         return this.y >= 180; 
     }
+
+    throw() {
+        if (this.bottles > 0) {
+            let bottle = new ThrowableObject(this.x + 100, this.y + 100);
+            this.world.throwableObjects.push(bottle);
+            this.bottles--;
+        }
+    }
+
+    updateKeyboardState(key, state) {
+        if (this.world && this.world.keyboard) {
+            this.world.keyboard[key] = state;
+        }
+    }
 }

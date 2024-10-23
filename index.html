@@ -22,19 +22,35 @@
     <div class="gameContainer">
         <canvas id="canvas" width="720px" height="480px"></canvas>
 
-            <div id="startScreen" class="overlay">
-                <img src="images/9_intro_outro_screens/start/startscreen_1.png" alt="Start Screen" class="start-image">
-                <button id="startButton" onclick="startGame()">Start Game</button>
-            </div>
-            <button id="restartButton" onclick="restartGame()" style="display: none;">Restart Game</button>
+        <div class="control-buttons">
+            <div id="fullscreenButton" class="control-icon fullscreen-icon"></div>
+            <div id="soundButton" class="control-icon sound-icon"></div>
+            <div id="restartButton-mobile" onclick="restartGame()" class="control-icon restart-icon"></div>
+        </div>
 
+        <div id="startScreen" class="overlay">
+            <img src="images/9_intro_outro_screens/start/startscreen_1.png" alt="Start Screen" class="start-image">
+            <button id="startButton" onclick="startGame()">Start Game</button>
+        </div>
+        <button id="restartButton" onclick="restartGame()" style="display: none;">Restart Game</button>
+        
+        <div id="buttons-container">
+            <div class="left-buttons">
+                <button id="leftButton"></button>
+                <button id="rightButton"></button>
+            </div>
+            <div class="right-buttons">
+                <button id="jumpButton"></button>
+                <button id="throwButton">↷</button>
+            </div>
+        </div>
     </div>
 
     <div id='rotateDevice' class='rotate-device'>
         <div class='rotate-device-content'>
-            <h2>Bitte drehen Sie Ihr Gerät!</h2>
+            <h2>Please turn Your device to play!</h2>
             <div class='rotate-arrow'></div>
-            <p>Tippen Sie hier, um fortzufahren</p>
+            <p></p>
         </div>
     </div>
     

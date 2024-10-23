@@ -3,6 +3,7 @@ let canvas;
 let world;
 let keyboard = new Keyboard();
 let backgroundMusic;
+let isMuted = true;
 
 function init() {
     canvas = document.getElementById('canvas');
@@ -11,13 +12,24 @@ function init() {
     backgroundMusic.loop = true;
     backgroundMusic.volume = 0.5;
 
-    document.addEventListener('click', startBackgroundMusic, { once: true });
+    document.getElementById('soundButton').addEventListener('click', toggleSound);
 }
 
 function startBackgroundMusic() {
     backgroundMusic.play().catch(error => {
         console.error("Fehler beim Abspielen der Hintergrundmusik:", error);
     });
+}
+
+function toggleSound() {
+    isMuted = !isMuted;
+    if (isMuted) {
+        backgroundMusic.pause(); // Musik pausieren
+        document.getElementById('soundButton').classList.add('muted');
+    } else {
+        startBackgroundMusic(); // Musik abspielen, wenn nicht gemutet
+        document.getElementById('soundButton').classList.remove('muted');
+    }
 }
 
 function startGame() {

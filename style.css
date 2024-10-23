@@ -15,8 +15,9 @@ body {
 
 .gameContainer {
     position: relative;
-    width: 720px;
-    height: 480px;
+    width: 100%; 
+    max-width: 720px;
+    height: auto; 
     margin: 0 auto;
 }
 
@@ -34,6 +35,9 @@ canvas {
     border: 1px solid orange;
     display: block;
     margin: 0 auto;
+    width: 100%; 
+    height: auto;
+    max-width: 720px;
 }
 
 .rotate-device {
@@ -43,7 +47,7 @@ canvas {
     width: 100%;
     height: 100%;
     background-color: rgba(0, 0, 0, 0.7);
-    background-image: url('images/background.jpg');
+    /* background-image: url('images/background.jpg'); */
     background-size: cover;
     background-position: center;
     display: none;
@@ -68,8 +72,8 @@ canvas {
     width: 100px;
     height: 100px;
     margin: 20px auto;
-    border: 10px solid #fff;
-    border-top: 10px solid #4CAF50;
+    border: 10px solid #ffffff;
+    border-top: 10px solid orange;
     border-radius: 50%;
     animation: spin 2s linear infinite;
 }
@@ -161,8 +165,184 @@ canvas {
     cursor: pointer;
   }
 
-  
-  
+  #buttons-container {
+    position: absolute;
+    bottom: 20px;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: space-between;
+    z-index: 1000;
+    pointer-events: none;
+}
+
+.left-buttons, .right-buttons {
+    pointer-events: auto; 
+}
+
+#buttons-container button {
+    background-color: orange;
+    border: 1px solid #000000;
+    border-radius: 50%;
+    color: black;
+    padding: 10px;
+    margin: 5px;
+    font-size: 20px;
+    cursor: pointer;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
+}
+
+#buttons-container #leftButton,
+#buttons-container #rightButton,
+#buttons-container #jumpButton,
+#buttons-container #throwButton {
+    position: relative;
+    bottom: 0;
+}
+
+.left-buttons {
+    position: absolute;
+    left: 20px;
+    bottom: -10px;
+    display: flex;
+}
+
+.right-buttons {
+    position: absolute;
+    right: 20px;
+    bottom:-10px;
+    display: flex;
+}
+
+#buttons-container #rightButton {
+    margin-left: 10px;
+}
+
+#buttons-container #throwButton {
+    margin-left: 10px;
+}
+
+#leftButton::before {
+    content: '\2190'; 
+    font-size: 24px;
+    bottom: 4px;
+    position: relative;
+}
+
+#rightButton::before {
+    content: '\2192'; 
+    font-size: 24px;
+    bottom: 4px;
+    position: relative;
+}
+
+#jumpButton::before {
+    content: '\2191'; 
+    font-size: 24px;
+}
+
+#throwButton::before {
+    font-size: 24px;
+}
+
+.fullscreen-icon {
+    position: absolute;
+    right: 20px;
+    top: -230px;
+    cursor: pointer;
+    background-color: orange;
+    border: 1px solid black;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    padding: 5px;
+}
+
+#soundButton {
+    position: absolute;
+    right: 20px;
+    top: -170px;
+    cursor: pointer;
+    background-color: orange;
+    border: 1px solid black;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    padding: 5px;
+}
+
+#restartButton-mobile {
+    position: absolute;
+    right: 20px;
+    top: -290px;
+    cursor: pointer;
+    background-color: orange;
+    border: 1px solid black;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    padding: 5px;
+}
+
+.fullscreen-icon::before {
+    content: '\26F6'; 
+    font-size: 20px;
+    color: #000000;
+}
+
+.fullscreen-icon:hover {
+    background-color: orange;
+}
+
+.control-buttons {
+    position: absolute;
+    right: 20px;
+    display: flex;
+    gap: 10px;
+    z-index: 1000;
+}
+
+.control-icon {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    background-color: orange;
+    border: 1px solid black;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 20px;
+    color: #000000;
+}
+
+.fullscreen-icon::before {
+    content: '\26F6';
+}
+
+.sound-icon::before {
+    content: '\1F50A';
+    font-size: 14px;
+}
+
+.sound-icon.muted::before {
+    content: '\1F507';
+}
+
+.restart-icon::before {
+    content: '\21BB';
+}
 
 .start-image {
     width: 100%;
@@ -244,7 +424,7 @@ canvas {
 
 .fullscreen-icon::before {
     content: '[ ]';
-    font-size: 24px;
+    font-size: 18px;
     font-weight: lighter;
 }
 
@@ -268,6 +448,21 @@ canvas {
     }
     
     h1 {
+        display: none;
+    }
+}
+
+@media only screen and (max-width: 720px) {
+    #buttons-container {
+        bottom: 10px; 
+        flex-direction: column; 
+        gap: 10px; 
+    }
+}
+
+@media only screen and (min-width: 950px) {
+    .control-buttons,
+    #buttons-container {
         display: none;
     }
 }
