@@ -216,10 +216,6 @@ class World {
         }
     }
 
-    // createCoins() {
-    //     return this.createObjectPool(Coins, 10);
-    // }
-
     createCoins() {
         let coins = [];
         for (let i = 0; i < 10; i++) { 
@@ -228,10 +224,6 @@ class World {
         }
         return coins;
     }
-    
-    // createBottles() {
-    //     return this.createObjectPool(Bottles, 5);
-    // }
 
     createBottles() {
         let bottles = []; 
@@ -397,7 +389,7 @@ class World {
         setTimeout(() => {
           this.draw();
           this.stopAllAnimations();
-          document.getElementById('restartButton').style.display = 'block';
+        //   document.getElementById('restartButton').style.display = 'block';
         }, 50);
       }
 
@@ -409,12 +401,11 @@ class World {
     
         this.addObjectsToMap(this.level.backgroundObjects);
         this.addObjectsToMap(this.level.clouds);
-        
+        this.addObjectsToMap(this.coins);
         this.addObjectsToMap(this.bottles);
         this.addToMap(this.character);
         this.addObjectsToMap(this.level.enemies);
         this.addObjectsToMap(this.throwableObjects);
-        this.addObjectsToMap(this.coins);
     
         this.ctx.restore();
     

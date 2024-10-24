@@ -25,13 +25,56 @@
             <div id="fullscreenButton" class="control-icon fullscreen-icon"></div>
             <div id="soundButton" class="control-icon sound-icon"></div>
             <div id="restartButton-mobile" onclick="restartGame()" class="control-icon restart-icon"></div>
+            <div id="helpButton" onclick="toggleHelpOverlay()" class="control-icon help-icon">?</div>
         </div>
-
+        
+        <div id="helpOverlay" class="help-overlay" style="display: none;">
+            <div class="help-overlay-content">
+                <span class="help-close-button" onclick="toggleHelpOverlay()">&times;</span>
+                <h2>Game Instructions</h2>
+                <div class="twoRows">
+                    <div class="left">
+                        <ul class="instructions">
+                            <li>
+                                <span>  
+                                    <svg class="control-icon" width="24" height="24" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M14 7l-5 5 5 5V7z"/>
+                                    </svg>
+                                </span>Left
+                            </li>
+                            <li>
+                                <span>    
+                                    <svg class="control-icon" width="24" height="24" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M10 17l5-5-5-5v10z"/>
+                                    </svg>
+                                </span>Right
+                            </li>
+                            <li>
+                                <span>
+                                    <svg class="control-icon" width="30" height="30" xmlns="http://www.w3.org/2000/svg">
+                                        <circle cx="15" cy="15" r="14" fill="orange" stroke="black" stroke-width="1"/>
+                                        <rect x="8" y="14" width="14" height="2" fill="black"/>
+                                    </svg>
+                                </span>Jump
+                            </li>
+                            <li>
+                                <span>
+                                    <svg class="control-icon" width="24" height="24" xmlns="http://www.w3.org/2000/svg">
+                                        <text x="4" y="17">D</text>
+                                    </svg>
+                                </span>Throw Bottle
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="right"></div>
+                </div>
+            </div>
+        </div>
+        
         <div id="startScreen" class="overlay">
             <img src="images/9_intro_outro_screens/start/startscreen_1.png" alt="Start Screen" class="start-image">
             <button id="startButton" onclick="startGame(); startBackgroundMusic();">Start Game</button>
         </div>
-        <button id="restartButton" onclick="restartGame()" style="display: none;">Restart Game</button>
         
         <div id="buttons-container" style="display: none;">
             <div class="left-buttons">
@@ -44,14 +87,6 @@
             </div>
         </div>
 
-    </div>
-
-    <div id="game-controls" class="game-controls">
-        <ul>
-            <li><span>⬅️ Left / Right ➡️</span></li>
-            <li><span>Jump ⎵ Space</span></li>
-            <li><span>Throw Bottle D</span> </li>
-        </ul>
     </div>
 
     <div id="legal" class="legal">
@@ -89,20 +124,19 @@
     <script src="orientation.js"></script>
 
     <script>
-function isTouchDevice() {
-    return ('ontouchstart' in window) || 
-           (navigator.maxTouchPoints > 0) || 
-           (navigator.msMaxTouchPoints > 0) ||
-           window.matchMedia("(pointer: coarse)").matches;
-}
+        function isTouchDevice() {
+            return ('ontouchstart' in window) || 
+                (navigator.maxTouchPoints > 0) || 
+                (navigator.msMaxTouchPoints > 0) ||
+                window.matchMedia("(pointer: coarse)").matches;
+        }
 
-if (isTouchDevice()) {
-    document.getElementById("buttons-container").style.display = "block";
-    document.getElementById("control-buttons").style.display = "block";
-}
+        if (isTouchDevice()) {
+            document.getElementById("buttons-container").style.display = "block";
+            document.getElementById("control-buttons").style.display = "block";
+        }
 
-document.getElementById('soundButton').addEventListener('click', toggleSound);
-
+        document.getElementById('soundButton').addEventListener('click', toggleSound);
     </script>
 
 </body>

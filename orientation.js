@@ -172,3 +172,30 @@ function unmute() {
 
     document.getElementById('soundButton').classList.remove('muted');
 }
+
+
+function toggleHelpOverlay() {
+    const overlay = document.getElementById('helpOverlay');
+    
+    if (overlay.style.display === 'none' || overlay.style.display === '') {
+        overlay.style.display = 'flex';
+        // Event listener to close the overlay when clicking outside of it
+        window.addEventListener('click', closeHelpOverlayOnClickOutside);
+        // Prevent clicks on the overlay content from closing the overlay
+        document.querySelector('.help-overlay-content').addEventListener('click', function(event) {
+            event.stopPropagation();
+        });
+    } else {
+        overlay.style.display = 'none';
+        window.removeEventListener('click', closeHelpOverlayOnClickOutside);
+    }
+}
+
+function closeHelpOverlayOnClickOutside(event) {
+    const overlay = document.getElementById('helpOverlay');
+    
+    if (event.target === overlay) {
+        overlay.style.display = 'none';
+        window.removeEventListener('click', closeHelpOverlayOnClickOutside);
+    }
+}

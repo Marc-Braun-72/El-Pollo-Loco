@@ -75,11 +75,9 @@ function startGame() {
     startBackgroundMusic();
     initLevel();
     document.getElementById('startScreen').style.display = 'none';
-    document.getElementById('restartButton').style.display = 'none';
 
     world = new World(canvas, keyboard);
     world.start();
-    document.getElementById('game-controls').style.display = 'none';
     document.getElementById('legal').style.display = 'none';
 }
 
@@ -101,7 +99,7 @@ function restartGame() {
         world.start();
     }
 
-    document.getElementById('restartButton').style.display = 'none';
+    // document.getElementById('restartButton').style.display = 'none';
     document.getElementById('startScreen').style.display = 'none';
 }
 
