@@ -21,7 +21,7 @@ function startBackgroundMusic() {
             backgroundMusic.play().catch(error => {
                 console.error("Fehler beim Abspielen der Hintergrundmusik:", error);
             });
-        }, 500);  // 500ms Verzögerung vor dem Abspielen
+        }, 500); 
     } else {
         console.error("backgroundMusic ist nicht initialisiert.");
     }
@@ -30,28 +30,39 @@ function startBackgroundMusic() {
 
 function toggleSound() {
     if (!backgroundMusic) {
-        // Wenn backgroundMusic nicht initialisiert ist, initialisieren
         backgroundMusic = new Audio('audio/la_cucaracha.mp3');
         backgroundMusic.loop = true;
         backgroundMusic.volume = 0.5;
     }
 
     isMuted = !isMuted;
+
     if (isMuted) {
         backgroundMusic.pause();
     } else {
         startBackgroundMusic();
     }
 
-    // Soundeffekte überprüfen
     if (world && world.character) {
         world.character.walking_sound.muted = isMuted;
         world.character.jump_sound.muted = isMuted;
-        // Hier weitere Effekte stummschalten oder aktivieren
+
+        if (world.damageSound) {
+            world.damageSound.muted = isMuted;
+        }
+
+        if (world.throwableObjects) {
+            world.throwableObjects.forEach(bottle => {
+                if (bottle.bottleSound) {
+                    bottle.bottleSound.muted = isMuted;
+                }
+            });
+        }
     }
 
     document.getElementById('soundButton').classList.toggle('muted', isMuted);
 }
+
 
 
 function startGame() {

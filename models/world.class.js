@@ -25,6 +25,7 @@ class World {
         this.initializeGameObjects();
         this.initializeImages();
         this.initializeWorld();
+        this.addObjectsToMap(this.coins);
     }
     
     initializeCanvas(canvas) {
@@ -182,9 +183,11 @@ class World {
                     this.throwableObjects.splice(i, 1);
                     this.updateEndbossStatusBar();
                     
-                    let damageSound = new Audio('audio/alarm.mp3');
-                    damageSound.volume = 0.9;
-                    damageSound.play();
+                    if (!isMuted) { 
+                        let damageSound = new Audio('audio/alarm.mp3');
+                        damageSound.volume = 0.9;
+                        damageSound.play();
+                    }
                     break;
                 }
             }
@@ -197,8 +200,10 @@ class World {
                 this.bottles.splice(index, 1);
                 this.statusBarBottles.addBottle();
                 
-                let bottleSound = new Audio('audio/bottle.mp3');
-                bottleSound.play();
+                if (!isMuted) { 
+                    let bottleSound = new Audio('audio/bottle.mp3');
+                    bottleSound.play();
+                }
             }
         });
     }
@@ -211,12 +216,30 @@ class World {
         }
     }
 
+    // createCoins() {
+    //     return this.createObjectPool(Coins, 10);
+    // }
+
     createCoins() {
-        return this.createObjectPool(Coins, 10);
+        let coins = [];
+        for (let i = 0; i < 10; i++) { 
+            let coin = new Coins(); 
+            coins.push(coin);
+        }
+        return coins;
     }
     
+    // createBottles() {
+    //     return this.createObjectPool(Bottles, 5);
+    // }
+
     createBottles() {
-        return this.createObjectPool(Bottles, 5);
+        let bottles = []; 
+        for (let i = 0; i < 5; i++) { 
+            let bottle = new Bottles(); 
+            bottles.push(bottle); 
+        }
+        return bottles;
     }
     
     createObjectPool(ObjectClass, count) {
@@ -291,10 +314,12 @@ class World {
     }
     
     playChickenDeathSound() {
-        let chickenDeathSound = new Audio('audio/chickenDeathSound.mp3');
-        chickenDeathSound.play();
-        chickenDeathSound.loop = false;
-        chickenDeathSound.volume = 0.3;
+        if (!isMuted) { 
+            let chickenDeathSound = new Audio('audio/chickenDeathSound.mp3');
+            chickenDeathSound.play();
+            chickenDeathSound.loop = false;
+            chickenDeathSound.volume = 0.3;
+        }
     }
 
     isColliding(obj1, obj2) {
@@ -316,9 +341,24 @@ class World {
     update() {
         if (this.isGameOver) {
             this.stopGameLoop();
-            return;
-        }
-    
+            console.log('Updating game state, isGameOver:', this.isGameOver);
+            if (this.isGameOver) {
+                console.log('Game is over, drawing game over screen.');
+                this.drawGameOverScreen();
+            this.stopGameLoop();
+                    } else {
+                        if (Array.isArray(this.bottles)) {
+                            this.bottles.forEach(bottle => {
+                                bottle.playAnimation(bottle.IMAGES_BOTTLES);
+                            });
+                        }
+                        if (Array.isArray(this.coins)) {
+                            this.coins.forEach(coin => {
+                                coin.playAnimation(coin.IMAGES_COINS);
+                            });    
+                        }}
+        return;
+                    }
         this.checkCollisions();
         this.checkThrowObjects();
         this.checkCoinCollisions();
@@ -361,7 +401,7 @@ class World {
         }, 50);
       }
 
-    draw() {
+      draw() {
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     
         this.ctx.save();
@@ -369,21 +409,26 @@ class World {
     
         this.addObjectsToMap(this.level.backgroundObjects);
         this.addObjectsToMap(this.level.clouds);
+        
         this.addObjectsToMap(this.bottles);
         this.addToMap(this.character);
         this.addObjectsToMap(this.level.enemies);
         this.addObjectsToMap(this.throwableObjects);
+        this.addObjectsToMap(this.coins);
     
         this.ctx.restore();
+    
+        this.coins.forEach((coin, index) => {
+            this.ctx.save();
+            this.ctx.translate(coin.x - this.camera_x, coin.y);  
+            coin.drawImage(this.ctx);
+            this.ctx.restore();
+        });
     
         this.addToMap(this.statusBar);
         this.addToMap(this.statusBarBottles);
         this.addToMap(this.statusBarCoins);
         this.addToMap(this.statusBarEndboss);
-    
-        if (this.coins) {
-            this.coins.forEach(coin => coin.drawImage(this.ctx));
-        }
     
         if (this.isGameOver) {
             this.isWin ? this.drawWinScreen() : this.drawGameOverScreen();
@@ -432,13 +477,14 @@ class World {
                 this.coins.splice(index, 1);
                 this.score += 10;
                 this.statusBarCoins.addCoin();
-                
-                let coinSound = new Audio('audio/coin.mp3');
-                coinSound.play();
+                if (!isMuted) {
+                    let coinSound = new Audio('audio/coin.mp3');
+                    coinSound.play();
+                }
             }
         });
     }
-
+    
     addObjectsToMap(objects) {
         objects.forEach(o => {
             this.addToMap(o);

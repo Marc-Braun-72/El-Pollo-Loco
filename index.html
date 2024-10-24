@@ -18,7 +18,6 @@
 </head>
 <body onload="init()">
 
-  <!-- <h1>El pollo loco</h1> -->
     <div class="gameContainer">
         <canvas id="canvas" width="720px" height="480px"></canvas>
 
@@ -90,16 +89,19 @@
     <script src="orientation.js"></script>
 
     <script>
-        function isMobile() {
-            return /iPhone|iPad|iPod|Android|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-        }
-    
-        if (isMobile()) {
-            document.getElementById("buttons-container").style.display = "block";
-            document.getElementById("control-buttons").style.display = "block";
-        }
+function isTouchDevice() {
+    return ('ontouchstart' in window) || 
+           (navigator.maxTouchPoints > 0) || 
+           (navigator.msMaxTouchPoints > 0) ||
+           window.matchMedia("(pointer: coarse)").matches;
+}
 
-        document.getElementById('soundButton').addEventListener('click', toggleSound);
+if (isTouchDevice()) {
+    document.getElementById("buttons-container").style.display = "block";
+    document.getElementById("control-buttons").style.display = "block";
+}
+
+document.getElementById('soundButton').addEventListener('click', toggleSound);
 
     </script>
 

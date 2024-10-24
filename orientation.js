@@ -25,8 +25,6 @@ window.addEventListener('load', () => {
     document.getElementById('rotateDevice').addEventListener('click', hideRotateDevice);
 });
 
-
-// Controls für Touch-Devices
 document.addEventListener('DOMContentLoaded', () => {
     let leftButton = document.getElementById('leftButton');
     let rightButton = document.getElementById('rightButton');
@@ -83,8 +81,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
-
-// Control-Button
 document.addEventListener('DOMContentLoaded', () => {
     let fullscreenButton = document.getElementById('fullscreenButton');
     let soundButton = document.getElementById('soundButton');
@@ -144,7 +140,6 @@ function mute() {
 
     document.getElementById('soundButton').classList.add('muted');
 }
-
 
 function unmute() {
     isMuted = false;

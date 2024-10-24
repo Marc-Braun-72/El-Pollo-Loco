@@ -228,9 +228,7 @@ class Character extends MoveableObject {
         this.isGameOver = true;
     
         setTimeout(() => {
-            if (isWin) {
-                this.drawWinScreen();
-            } else {
+            if (!isWin) {
                 this.drawGameOverScreen();
             }
             this.stopGameLoop();
@@ -238,16 +236,6 @@ class Character extends MoveableObject {
     
             document.getElementById('restartButton').style.display = 'block';
         }, 500); 
-    }
-    
-    drawWinScreen() {
-        const canvas = document.getElementById('canvas');
-        if (!canvas) return;
-        const ctx = canvas.getContext('2d');
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        if (this.winImageLoaded) {
-            ctx.drawImage(this.winImage, 0, 0, canvas.width, canvas.height);
-        } 
     }
 
     drawEndScreen(isWin) {
@@ -411,7 +399,10 @@ class Character extends MoveableObject {
     
     startJump() {
         this.isJumping = true;
-        this.jump_sound.play();
+    
+        if (!isMuted) {
+            this.jump_sound.play();
+        }
         this.jump();
     }
     
@@ -423,10 +414,13 @@ class Character extends MoveableObject {
         if (!this.isJumping && this.isOnGround()) {
             this.speedY = -25; 
             this.isJumping = true;
-            this.jump_sound.play();
+    
+            if (!isMuted) {
+                this.jump_sound.play();
+            }
         }
     }
-
+    
     isOnGround() {
         return this.y >= 180; 
     }
