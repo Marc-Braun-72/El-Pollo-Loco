@@ -296,22 +296,113 @@ canvas {
     padding: 5px;
 }
 
+.twoRows {
+    display: flex;
+
+}
+
 .left,
 .right {
     max-width: 48%;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
 
-ul.instructions {
-    list-style: none;
+.custom-buttons-container {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    width: 100%;
+    max-width: 300px;
+    margin: 20px auto;
 }
 
-ul.instructions li {
+.custom-left-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: flex-start;
+}
+
+.custom-left-buttons button {
+    background-color: orange;
+    border: 1px solid #000;
+    border-radius: 50%;
+    color: black;
+    width: 40px;
+    height: 40px;
+    font-size: 20px;
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 10px;
+}
+
+.custom-button-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+img.baby-chicken {
+    width: 30px;
+    height: auto;
+    margin: 0 auto;
+    padding-right: 12px;
+}
+
+img.chicken {
+    width: 40px;
+    height: auto;
+    margin: 0 auto;
+    padding-right: 12px;
+}
+
+img.endboss {
+    width: 50px;
+    height: auto;
+    margin: 0 auto;
+    padding-right: 12px;
+}
+
+p.chicken-list {
     display: flex;
     align-items: center;
 }
 
-ul.instructions li span {
-    padding: 10px;
+.right {
+    align-items: flex-start;
+}
+
+.right .chicken-list {
+    margin-left: 0;
+    padding-left: 0;
+}
+
+
+#customLeftButton::before {
+    content: '\2190'; 
+    font-size: 24px;
+}
+
+#customRightButton::before {
+    content: '\2192'; 
+    font-size: 24px;
+}
+
+#customJumpButton::before {
+    content: '\2191'; 
+    font-size: 24px;
+}
+
+#customThrowButton::before {
+    content: '\21BB'; 
+    font-size: 24px;
+    font-weight: normal;
 }
 
 #restartButton-mobile {

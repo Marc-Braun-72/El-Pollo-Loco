@@ -22,11 +22,8 @@ function startBackgroundMusic() {
                 console.error("Fehler beim Abspielen der Hintergrundmusik:", error);
             });
         }, 500); 
-    } else {
-        console.error("backgroundMusic ist nicht initialisiert.");
     }
 }
-
 
 function toggleSound() {
     if (!backgroundMusic) {
@@ -59,11 +56,8 @@ function toggleSound() {
             });
         }
     }
-
     document.getElementById('soundButton').classList.toggle('muted', isMuted);
 }
-
-
 
 function startGame() {
     if (!backgroundMusic) {
@@ -99,7 +93,6 @@ function restartGame() {
         world.start();
     }
 
-    // document.getElementById('restartButton').style.display = 'none';
     document.getElementById('startScreen').style.display = 'none';
 }
 

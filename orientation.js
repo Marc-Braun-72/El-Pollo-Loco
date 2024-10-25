@@ -1,4 +1,4 @@
-// Detect Landscape-Orientation
+
 let isRotateDeviceVisible = false;
 
 function checkOrientation() {
@@ -137,7 +137,6 @@ function mute() {
             }
         });
     }
-
     document.getElementById('soundButton').classList.add('muted');
 }
 
@@ -169,7 +168,6 @@ function unmute() {
             }
         });
     }
-
     document.getElementById('soundButton').classList.remove('muted');
 }
 
@@ -179,9 +177,7 @@ function toggleHelpOverlay() {
     
     if (overlay.style.display === 'none' || overlay.style.display === '') {
         overlay.style.display = 'flex';
-        // Event listener to close the overlay when clicking outside of it
         window.addEventListener('click', closeHelpOverlayOnClickOutside);
-        // Prevent clicks on the overlay content from closing the overlay
         document.querySelector('.help-overlay-content').addEventListener('click', function(event) {
             event.stopPropagation();
         });

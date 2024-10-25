@@ -32,41 +32,35 @@
             <div class="help-overlay-content">
                 <span class="help-close-button" onclick="toggleHelpOverlay()">&times;</span>
                 <h2>Game Instructions</h2>
+                <p>Help Pepe to find coins and tabasco salsa to fight against the crazy hen.</p>
                 <div class="twoRows">
                     <div class="left">
-                        <ul class="instructions">
-                            <li>
-                                <span>  
-                                    <svg class="control-icon" width="24" height="24" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M14 7l-5 5 5 5V7z"/>
-                                    </svg>
-                                </span>Left
-                            </li>
-                            <li>
-                                <span>    
-                                    <svg class="control-icon" width="24" height="24" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M10 17l5-5-5-5v10z"/>
-                                    </svg>
-                                </span>Right
-                            </li>
-                            <li>
-                                <span>
-                                    <svg class="control-icon" width="30" height="30" xmlns="http://www.w3.org/2000/svg">
-                                        <circle cx="15" cy="15" r="14" fill="orange" stroke="black" stroke-width="1"/>
-                                        <rect x="8" y="14" width="14" height="2" fill="black"/>
-                                    </svg>
-                                </span>Jump
-                            </li>
-                            <li>
-                                <span>
-                                    <svg class="control-icon" width="24" height="24" xmlns="http://www.w3.org/2000/svg">
-                                        <text x="4" y="17">D</text>
-                                    </svg>
-                                </span>Throw Bottle
-                            </li>
-                        </ul>
+                        <div class="custom-buttons-container">
+                            <div class="custom-left-buttons">
+                                <div class="custom-button-wrapper">
+                                    <button id="customLeftButton"></button>
+                                    <span>Move Left</span>
+                                </div>
+                                <div class="custom-button-wrapper">
+                                    <button id="customRightButton"></button>
+                                    <span>Move Right</span>
+                                </div>
+                                <div class="custom-button-wrapper">
+                                    <button id="customJumpButton"></button>
+                                    <span>Jump (Space)</span>
+                                </div>
+                                <div class="custom-button-wrapper">
+                                    <button id="customThrowButton"></button>
+                                    <span>Throw Bottle</span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="right"></div>
+                    <div class="right">
+                        <p class="chicken-list"><img class="baby-chicken" src="./images/3_enemies_chicken/chicken_small/1_walk/1_w.png" alt="Baby Chicken">Not an Enemy</p>
+                        <p class="chicken-list"><img class="chicken" src="./images/3_enemies_chicken/chicken_normal/1_walk/1_w.png" alt="Chicken">Enemy</p>
+                        <p class="chicken-list"><img class="endboss" src="./images/4_enemie_boss_chicken/1_walk/G1.png" alt="Enboss">Endboss</p>
+                    </div>
                 </div>
             </div>
         </div>

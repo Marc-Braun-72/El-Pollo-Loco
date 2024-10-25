@@ -233,8 +233,6 @@ class Character extends MoveableObject {
             }
             this.stopGameLoop();
             this.stopAllAnimations();
-    
-            // document.getElementById('restartButton').style.display = 'block';
         }, 500); 
     }
 
