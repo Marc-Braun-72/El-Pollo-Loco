@@ -400,7 +400,7 @@ p.chicken-list {
 }
 
 #customThrowButton::before {
-    content: '\21BB'; 
+    /* content: '\21BB';  */
     font-size: 24px;
     font-weight: normal;
 }
@@ -626,6 +626,20 @@ a.legal-link:hover {
     cursor: pointer;
 }
 
+#helpButton {
+    animation: pulse 2s ease-in-out;
+    animation-iteration-count: 5; 
+}
+
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.2);
+    }
+}
+
 @media only screen and (max-width: 720px) {
     canvas {
         width: 100%;
@@ -636,28 +650,7 @@ a.legal-link:hover {
     canvas {
         height: 100vh;
     }
-    
-    h1 {
-        display: none;
-    }
 }
 
-@media only screen and (max-width: 720px) {
-    .fullscreen-icon {
-        top: -200px;
-    }
-    #soundButton {
-        top: -150px;
-    }
-    #restartButton-mobile {
-        top: -250px;
-    }
-    .control-buttons {
-        bottom: -60px;
-    }
-    #buttons-container {
-        bottom: 10px; 
-    }
-}
 
 
