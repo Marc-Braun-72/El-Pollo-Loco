@@ -452,13 +452,6 @@ p.chicken-list {
     color: #000000;
 }
 
-/* .space-bar {
-    width: 60px; 
-    height: auto; 
-    background-color: transparent; 
-    border-radius: 0; 
-} */
-
 .fullscreen-icon::before {
     content: '\26F6';
 }
@@ -616,7 +609,7 @@ a.legal-link:hover {
 }
 
 .help-overlay-content {
-    background-color: white;
+    background-color: #FF8303;
     padding: 20px;
     border-radius: 10px;
     width: 80%;

@@ -163,28 +163,33 @@ class World {
             this.checkGameState();
         }, 1000 / 60);
     }
-     
+
     checkGameState() {
-        if (this.isGameOver) return;
+        if (this.isGameOver || this.throwableObjects.some(bottle => bottle.isSplashing)) return;
+
         if (this.character.energy <= 0) {
             this.gameOver('Game Over - Du hast verloren!', false);
         } else if (this.level.enemies.some(enemy => enemy instanceof Endboss && enemy.energy <= 0)) {
             this.gameOver('Gratulation! Du hast gewonnen!', true);
         }
     }
-    
+
     checkBottleHits() {
-        for (let i = this.throwableObjects.length - 1; i >= 0; i--) {
+        const bottlesToRemove = [];
+        
+        for (let i = 0; i < this.throwableObjects.length; i++) {
             const bottle = this.throwableObjects[i];
+            
             for (const enemy of this.level.enemies) {
                 if (enemy instanceof Endboss && this.isColliding(bottle, enemy)) {
                     enemy.hit();
-                    bottle.splash();
-                    this.throwableObjects.splice(i, 1);
+                    bottle.splash(); 
+                    bottlesToRemove.push(bottle); 
+                    
                     this.updateEndbossStatusBar();
                     
                     if (!isMuted) { 
-                        let damageSound = new Audio('audio/alarm.mp3');
+                        let damageSound = new Audio('audio/ouch.mp3');
                         damageSound.volume = 0.9;
                         damageSound.play();
                     }
@@ -192,6 +197,8 @@ class World {
                 }
             }
         }
+
+        this.throwableObjects = this.throwableObjects.filter(bottle => !bottlesToRemove.includes(bottle));
     }
 
     checkBottlePickup() {
@@ -293,10 +300,10 @@ class World {
     
         this.throwableObjects.forEach((bottle, bottleIndex) => {
             this.level.enemies.forEach((enemy) => {
-                if (enemy instanceof Endboss && bottle.isColliding(enemy)) {
+                if (enemy instanceof Endboss && typeof bottle.isColliding === "function" && bottle.isColliding(enemy)) {  
                     enemy.hit();
                     this.throwableObjects.splice(bottleIndex, 1);
-                    
+    
                     if (enemy.isDead()) {
                         this.character.gameOver('Win', true);
                     }
@@ -304,6 +311,7 @@ class World {
             });
         });
     }
+    
     
     playChickenDeathSound() {
         if (!isMuted) { 
@@ -389,13 +397,12 @@ class World {
         setTimeout(() => {
           this.draw();
           this.stopAllAnimations();
-        //   document.getElementById('restartButton').style.display = 'block';
         }, 50);
       }
 
       draw() {
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-    
+
         this.ctx.save();
         this.ctx.translate(this.camera_x, 0);
     
@@ -405,8 +412,16 @@ class World {
         this.addObjectsToMap(this.bottles);
         this.addToMap(this.character);
         this.addObjectsToMap(this.level.enemies);
-        this.addObjectsToMap(this.throwableObjects);
+        // this.addObjectsToMap(this.throwableObjects);
     
+        this.throwableObjects.forEach(obj => {
+            if (obj.isSplashing) {
+                this.ctx.drawImage(obj.img, obj.x - this.camera_x, obj.y, obj.width, obj.height);
+            } else {
+                this.addToMap(obj);
+            }
+        });
+
         this.ctx.restore();
     
         this.coins.forEach((coin, index) => {
