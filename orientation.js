@@ -1,6 +1,8 @@
-
 let isRotateDeviceVisible = false;
 
+/**
+ * Checks the screen orientation and displays a rotate device prompt if in portrait mode.
+ */
 function checkOrientation() {
     let rotateDevice = document.getElementById('rotateDevice');
     if (window.innerHeight > window.innerWidth) {
@@ -12,6 +14,9 @@ function checkOrientation() {
     }
 }
 
+/**
+ * Hides the rotate device prompt if it is currently visible.
+ */
 function hideRotateDevice() {
     if (isRotateDeviceVisible) {
         document.getElementById('rotateDevice').style.display = 'none';
@@ -31,49 +36,72 @@ document.addEventListener('DOMContentLoaded', () => {
     let jumpButton = document.getElementById('jumpButton');
     let throwButton = document.getElementById('throwButton');
 
-
-    leftButton.addEventListener('touchend', (e) => {
-        e.stopPropagation();
-        e.preventDefault();
-        keyboard.LEFT = false;
-    });
-
+    /**
+     * Event listener for starting left movement on touchstart.
+     */
     leftButton.addEventListener('touchstart', (e) => {
         e.stopPropagation();
         e.preventDefault();
         keyboard.LEFT = true;
     });
 
+    /**
+     * Event listener for stopping left movement on touchend.
+     */
+    leftButton.addEventListener('touchend', (e) => {
+        e.stopPropagation();
+        e.preventDefault();
+        keyboard.LEFT = false;
+    });
+
+    /**
+     * Event listener for starting right movement on touchstart.
+     */
     rightButton.addEventListener('touchstart', (e) => {
         e.stopPropagation();
         e.preventDefault();
         keyboard.RIGHT = true;
     });
 
+    /**
+     * Event listener for stopping right movement on touchend.
+     */
     rightButton.addEventListener('touchend', (e) => {
         e.stopPropagation();
         e.preventDefault();
         keyboard.RIGHT = false;
     });
 
+    /**
+     * Event listener for starting jump on touchstart.
+     */
     jumpButton.addEventListener('touchstart', (e) => {
         e.preventDefault();
         e.stopPropagation();
         keyboard.SPACE = true;
     });
 
+    /**
+     * Event listener for stopping jump on touchend.
+     */
     jumpButton.addEventListener('touchend', (e) => {
         e.preventDefault();
         e.stopPropagation();
         keyboard.SPACE = false;
     });
 
+    /**
+     * Event listener for starting throw action on touchstart.
+     */
     throwButton.addEventListener('touchstart', (e) => {
         e.preventDefault();
         e.stopPropagation();
         keyboard.D = true;
     });
 
+    /**
+     * Event listener for stopping throw action on touchend.
+     */
     throwButton.addEventListener('touchend', (e) => {
         e.preventDefault();
         e.stopPropagation();
@@ -90,6 +118,9 @@ document.addEventListener('DOMContentLoaded', () => {
     soundButton.addEventListener('click', toggleSound);
     restartButtonMobile.addEventListener('click', restartGame);
 
+    /**
+     * Toggles fullscreen mode on or off.
+     */
     function toggleFullscreen() {
         if (!document.fullscreenElement) {
             document.documentElement.requestFullscreen();
@@ -101,6 +132,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
+/**
+ * Toggles sound muting or unmuting based on the current state.
+ */
 function checkMute() {
     if (isMuted) {
         unmute();
@@ -109,69 +143,37 @@ function checkMute() {
     }
 }
 
+/**
+ * Mutes all sounds in the game.
+ */
 function mute() {
     isMuted = true;
-    if (backgroundMusic) {
-        backgroundMusic.muted = true;
-    }
-
+    if (backgroundMusic) backgroundMusic.muted = true;
     if (world && world.character) {
         world.character.walking_sound.muted = true;
         world.character.jump_sound.muted = true;
     }
-
     world.damageSound.muted = true;
-    
-    if (world.throwableObjects) {
-        world.throwableObjects.forEach(bottle => {
-            if (bottle.bottleSound) {
-                bottle.bottleSound.muted = true;
-            }
-        });
-    }
-    
-    if (world.coins) {
-        world.coins.forEach(coin => {
-            if (coin.coinSound) {
-                coin.coinSound.muted = true;
-            }
-        });
-    }
     document.getElementById('soundButton').classList.add('muted');
 }
 
+/**
+ * Unmutes all sounds in the game.
+ */
 function unmute() {
     isMuted = false;
-    if (backgroundMusic) {
-        backgroundMusic.muted = false;
-    }
-
+    if (backgroundMusic) backgroundMusic.muted = false;
     if (world && world.character) {
         world.character.walking_sound.muted = false;
         world.character.jump_sound.muted = false;
     }
-
     world.damageSound.muted = false;
-    
-    if (world.throwableObjects) {
-        world.throwableObjects.forEach(bottle => {
-            if (bottle.bottleSound) {
-                bottle.bottleSound.muted = false;
-            }
-        });
-    }
-    
-    if (world.coins) {
-        world.coins.forEach(coin => {
-            if (coin.coinSound) {
-                coin.coinSound.muted = false;
-            }
-        });
-    }
     document.getElementById('soundButton').classList.remove('muted');
 }
 
-
+/**
+ * Toggles the visibility of the help overlay and handles click events to close it.
+ */
 function toggleHelpOverlay() {
     const overlay = document.getElementById('helpOverlay');
     
@@ -187,6 +189,10 @@ function toggleHelpOverlay() {
     }
 }
 
+/**
+ * Closes the help overlay if the click occurred outside its content.
+ * @param {MouseEvent} event - The mouse event triggering the close action.
+ */
 function closeHelpOverlayOnClickOutside(event) {
     const overlay = document.getElementById('helpOverlay');
     

@@ -1,20 +1,20 @@
-
 let canvas;
 let world;
 let keyboard = new Keyboard();
 let backgroundMusic;
 let isMuted = false;
 
+/**
+ * Initializes the game by setting up the canvas and sound button event listener.
+ */
 function init() {
     canvas = document.getElementById('canvas');
-
-    // backgroundMusic = new Audio('audio/la_cucaracha.mp3');
-    // backgroundMusic.loop = true;
-    // backgroundMusic.volume = 0.5;
-
     document.getElementById('soundButton').addEventListener('click', toggleSound);
 }
 
+/**
+ * Starts the background music with a delay to prevent playback issues.
+ */
 function startBackgroundMusic() {
     if (backgroundMusic) {
         setTimeout(() => {
@@ -25,6 +25,9 @@ function startBackgroundMusic() {
     }
 }
 
+/**
+ * Toggles the game sound by muting or unmuting all relevant sounds and updating the UI.
+ */
 function toggleSound() {
     if (!backgroundMusic) {
         backgroundMusic = new Audio('audio/la_cucaracha.mp3');
@@ -59,6 +62,10 @@ function toggleSound() {
     document.getElementById('soundButton').classList.toggle('muted', isMuted);
 }
 
+/**
+ * Starts the game by initializing background music, hiding the start screen, 
+ * initializing the level, and starting the game loop.
+ */
 function startGame() {
     if (!backgroundMusic) {
         backgroundMusic = new Audio('audio/la_cucaracha.mp3');
@@ -75,6 +82,10 @@ function startGame() {
     document.getElementById('legal').style.display = 'none';
 }
 
+/**
+ * Restarts the game by stopping all ongoing game loops, resetting variables, 
+ * and initializing a new game instance.
+ */
 function restartGame() {
     if (world) {
         world.stop();
@@ -96,6 +107,9 @@ function restartGame() {
     document.getElementById('startScreen').style.display = 'none';
 }
 
+/**
+ * Resets critical game variables, including the level, score, energy, and status bars.
+ */
 function resetGameVariables() {
     initLevel();  
     world.level = level1; 
@@ -123,7 +137,9 @@ function resetGameVariables() {
     } 
 }
 
-// Opera 100vh Fix aus einem Video
+/**
+ * Adjusts the canvas height based on the device orientation for certain browsers.
+ */
 function checkOrientation() {
     if (window.matchMedia("(orientation: landscape)").matches) {
         if (window.innerHeight < 480) {
@@ -137,43 +153,19 @@ function checkOrientation() {
 }
 
 window.addEventListener('keydown', (e) => {
-    if(e.keyCode == 39) {
-        keyboard.RIGHT = true;
-    } 
-    if(e.keyCode == 37) {
-        keyboard.LEFT = true;
-    }
-    if(e.keyCode == 38) {
-        keyboard.UP = true;
-    }
-    if(e.keyCode == 40) {
-        keyboard.DOWN = true;
-    }
-    if(e.keyCode == 32) {
-        keyboard.SPACE = true;
-    }
-    if(e.keyCode == 68) {
-        keyboard.D = true;
-    }
+    if(e.keyCode == 39) keyboard.RIGHT = true;
+    if(e.keyCode == 37) keyboard.LEFT = true;
+    if(e.keyCode == 38) keyboard.UP = true;
+    if(e.keyCode == 40) keyboard.DOWN = true;
+    if(e.keyCode == 32) keyboard.SPACE = true;
+    if(e.keyCode == 68) keyboard.D = true;
 });
 
 window.addEventListener('keyup', (e) => {
-    if(e.keyCode == 39) {
-        keyboard.RIGHT = false;
-    }
-    if(e.keyCode == 37) {
-        keyboard.LEFT = false;
-    }
-    if(e.keyCode == 38) {
-        keyboard.UP = false;
-    }
-    if(e.keyCode == 40) {
-        keyboard.DOWN = false;
-    }
-    if(e.keyCode == 32) {
-        keyboard.SPACE = false;
-    }
-    if(e.keyCode == 68) {
-        keyboard.D = false;
-    }
+    if(e.keyCode == 39) keyboard.RIGHT = false;
+    if(e.keyCode == 37) keyboard.LEFT = false;
+    if(e.keyCode == 38) keyboard.UP = false;
+    if(e.keyCode == 40) keyboard.DOWN = false;
+    if(e.keyCode == 32) keyboard.SPACE = false;
+    if(e.keyCode == 68) keyboard.D = false;
 });

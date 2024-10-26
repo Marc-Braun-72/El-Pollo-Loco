@@ -1,38 +1,127 @@
+/**
+ * Represents the game world, containing the character, levels, status bars, and all interactable objects.
+ */
 class World {
+    /**
+     * The main character in the game.
+     * @type {Character}
+     */
     character = new Character();
+
+    /**
+     * The current level in the game.
+     * @type {Level}
+     */
     level = level1;
+
+    /**
+     * The canvas element for rendering the game.
+     * @type {HTMLCanvasElement}
+     */
     canvas;
+
+    /**
+     * The 2D rendering context of the canvas.
+     * @type {CanvasRenderingContext2D}
+     */
     ctx;
+
+    /**
+     * The keyboard input object for controlling the character.
+     * @type {Keyboard}
+     */
     keyboard;
+
+    /**
+     * The camera's x-coordinate, used to control the visible area of the game.
+     * @type {number}
+     */
     camera_x = 0;
+
+    /**
+     * The player's health status bar.
+     * @type {StatusBar}
+     */
     statusBar = new StatusBar();
+
+    /**
+     * The player's bottle count status bar.
+     * @type {StatusBarBottles}
+     */
     statusBarBottles = new StatusBarBottles();
+
+    /**
+     * The player's coin count status bar.
+     * @type {StatusBarCoins}
+     */
     statusBarCoins = new StatusBarCoins();
+
+    /**
+     * The end boss's health status bar.
+     * @type {StatusBarEndboss}
+     */
     statusBarEndboss = new StatusBarEndboss();
+
+    /**
+     * Array of throwable objects in the game.
+     * @type {ThrowableObject[]}
+     */
     throwableObjects = [];
+
+    /**
+     * Array of coin objects in the game.
+     * @type {Coin[]}
+     */
     coins = [];
+
+    /**
+     * Array of bottle objects in the game.
+     * @type {Bottle[]}
+     */
     bottles = [];
+
+    /**
+     * The player's current score.
+     * @type {number}
+     */
     score = 0;
+
+    /**
+     * The sound effect for when the character takes damage.
+     * @type {Audio}
+     */
     damageSound = new Audio('audio/damage.mp3');
 
+    /**
+     * Initializes a new World instance, setting up the canvas, keyboard, and game objects.
+     * @param {HTMLCanvasElement} canvas - The canvas on which to render the game.
+     * @param {Keyboard} keyboard - The keyboard input for controlling the character.
+     */
     constructor(canvas, keyboard) {
         this.initializeCanvas(canvas);
         this.keyboard = keyboard;
         this.lastThrowTime = 0;
         this.throwCooldown = 500;
         this.endbossAlerted = false;
-    
+
         this.initializeGameObjects();
         this.initializeImages();
         this.initializeWorld();
         this.addObjectsToMap(this.coins);
     }
-    
+
+    /**
+     * Sets up the canvas and its rendering context.
+     * @param {HTMLCanvasElement} canvas - The canvas on which to render the game.
+     */
     initializeCanvas(canvas) {
         this.canvas = canvas;
         this.ctx = canvas.getContext('2d');
     }
-    
+
+    /**
+     * Initializes all game objects like coins, bottles, and status bars.
+     */
     initializeGameObjects() {
         this.coins = this.createCoins();
         this.bottles = this.createBottles();
@@ -45,12 +134,18 @@ class World {
             }
         });
     }
-    
+
+    /**
+     * Loads and initializes images for the game world.
+     */
     initializeImages() {
         this.gameOverImage = this.loadImage('images/9_intro_outro_screens/game_over/game over.png');
         this.winImage = this.loadImage('images/9_intro_outro_screens/win/win_2.png');
     }
-    
+
+    /**
+     * Initializes the world by assigning the world context to the character and enemies.
+     */
     initializeWorld() {
         this.setWorld();
         this.level.enemies.forEach(enemy => {
@@ -60,12 +155,21 @@ class World {
             }
         });
     }
-    
+
+    /**
+     * Starts the game by running the main loop and drawing the world.
+     */
     start() {
         this.run();
         this.draw();
     }
-    
+
+    /**
+     * Loads an image and optionally calls a callback when the image is loaded.
+     * @param {string} src - The source path of the image.
+     * @param {function} [onload] - Optional callback to execute when the image is loaded.
+     * @returns {HTMLImageElement} The loaded image.
+     */
     loadImage(src, onload = null) {
         const img = new Image();
         img.src = src;
@@ -76,6 +180,9 @@ class World {
         return img;
     }
 
+    /**
+     * Assigns the world context to all enemies in the level.
+     */
     assignWorldToEnemies() {
         if (this.level && this.level.enemies) {
             this.level.enemies.forEach(enemy => {
@@ -85,7 +192,10 @@ class World {
             });
         }
     }
-    
+
+    /**
+     * Stops the game by clearing the main game loop and stopping all character animations.
+     */
     stop() {
         if (this.gameLoopId) {
             clearInterval(this.gameLoopId); 
@@ -94,6 +204,9 @@ class World {
         this.character.stopAllAnimations();
     }
 
+    /**
+     * Stops the animation frame loop for the game.
+     */
     stopAnimationLoop() {
         if (this.animationFrameId) {
           cancelAnimationFrame(this.animationFrameId);
@@ -101,6 +214,9 @@ class World {
         }
     }
     
+    /**
+     * Stops all animations for the character, enemies, bottles, and coins.
+     */
     stopAllAnimations() {
         this.stopAnimationLoop();
         if (this.character && typeof this.character.stopAllAnimations === 'function') {
@@ -136,10 +252,17 @@ class World {
         }
     }
 
+    /**
+     * Sets the world context for the main character.
+     */
     setWorld() {
         this.character.world = this;
     }
 
+    /**
+     * Checks if the end boss should be alerted based on the character's position.
+     * Alerts the end boss and changes its behavior if necessary.
+     */
     checkEndbossAlert() {
         if (this.character.x > 500 && !this.endbossAlerted) {
             this.level.enemies.forEach(enemy => {
@@ -151,7 +274,11 @@ class World {
             this.endbossAlerted = true;
         }
     }
-    
+
+    /**
+     * Runs the main game loop, checking for collisions, object throws, coin pickups, bottle pickups, and the game state.
+     * Executes at a rate of 60 frames per second.
+     */
     run() {
         this.gameLoopId = setInterval(() => {
             this.checkCollisions();
@@ -164,6 +291,10 @@ class World {
         }, 1000 / 60);
     }
 
+    /**
+     * Checks the game state to determine if the game is over or won.
+     * Ends the game if the character's energy reaches zero or if the end boss's energy reaches zero.
+     */
     checkGameState() {
         if (this.isGameOver || this.throwableObjects.some(bottle => bottle.isSplashing)) return;
 
@@ -174,6 +305,10 @@ class World {
         }
     }
 
+    /**
+     * Checks if any thrown bottles collide with enemies, particularly the end boss.
+     * If a collision occurs, the bottle splashes and damages the end boss.
+     */
     checkBottleHits() {
         const bottlesToRemove = [];
         
@@ -201,6 +336,10 @@ class World {
         this.throwableObjects = this.throwableObjects.filter(bottle => !bottlesToRemove.includes(bottle));
     }
 
+    /**
+     * Checks if the character collides with bottles in the level, picking them up if so.
+     * Increases the bottle count and updates the status bar if a bottle is collected.
+     */
     checkBottlePickup() {
         this.bottles.forEach((bottle, index) => {
             if (this.character.isColliding(bottle)) {
@@ -215,6 +354,9 @@ class World {
         });
     }
     
+    /**
+     * Updates the end boss status bar based on the end boss's current energy.
+     */
     updateEndbossStatusBar() {
         if (this.level.enemies.some(enemy => enemy instanceof Endboss)) {
             const endboss = this.level.enemies.find(enemy => enemy instanceof Endboss);
@@ -223,6 +365,10 @@ class World {
         }
     }
 
+    /**
+     * Creates an array of coin objects for the level.
+     * @returns {Coins[]} Array of coin objects.
+     */
     createCoins() {
         let coins = [];
         for (let i = 0; i < 10; i++) { 
@@ -232,6 +378,10 @@ class World {
         return coins;
     }
 
+    /**
+     * Creates an array of bottle objects for the level.
+     * @returns {Bottles[]} Array of bottle objects.
+     */
     createBottles() {
         let bottles = []; 
         for (let i = 0; i < 5; i++) { 
@@ -241,6 +391,12 @@ class World {
         return bottles;
     }
     
+    /**
+     * Creates a pool of reusable game objects.
+     * @param {Function} ObjectClass - The class of the objects to create in the pool.
+     * @param {number} count - The number of objects to create in the pool.
+     * @returns {Object[]} Array of pooled objects.
+     */
     createObjectPool(ObjectClass, count) {
         const pool = [];
         for (let i = 0; i < count; i++) {
@@ -251,15 +407,28 @@ class World {
         return pool;
     }
     
+    /**
+     * Retrieves an inactive object from the object pool.
+     * @param {Object[]} pool - The pool of objects to retrieve from.
+     * @returns {Object} The first inactive object in the pool.
+     */
     getObjectFromPool(pool) {
         return pool.find(obj => !obj.active);
     }
     
+    /**
+     * Returns an object to the pool, marking it as inactive and resetting its properties.
+     * @param {Object} obj - The object to return to the pool.
+     */
     returnObjectToPool(obj) {
         obj.active = false;
         obj.reset();
     }
     
+    /**
+     * Checks if the player has thrown a bottle and if the throw cooldown has passed.
+     * If a bottle is thrown, it is added to the throwableObjects array and the bottle count is decreased.
+     */
     checkThrowObjects() {
         const currentTime = new Date().getTime();
         if (this.keyboard.D && 
@@ -275,6 +444,10 @@ class World {
         }
     }
 
+    /**
+     * Checks for collisions between the character and enemies.
+     * Handles enemy deaths, damage to the character, and updates the status bar.
+     */
     checkCollisions() {
         this.level.enemies.forEach((enemy, index) => {
             if (enemy instanceof Chicken && !enemy.isDying) {
@@ -312,7 +485,9 @@ class World {
         });
     }
     
-    
+    /**
+     * Plays the sound for a chicken's death if sound is not muted.
+     */
     playChickenDeathSound() {
         if (!isMuted) { 
             let chickenDeathSound = new Audio('audio/chickenDeathSound.mp3');
@@ -322,6 +497,12 @@ class World {
         }
     }
 
+    /**
+     * Checks if two objects are colliding based on their coordinates and dimensions.
+     * @param {Object} obj1 - The first object to check.
+     * @param {Object} obj2 - The second object to check.
+     * @returns {boolean} True if obj1 and obj2 are colliding, false otherwise.
+     */
     isColliding(obj1, obj2) {
         return (
             obj1.x + obj1.width > obj2.x &&
@@ -331,6 +512,9 @@ class World {
         );
     }
 
+    /**
+     * Stops the main game loop by clearing its interval.
+     */
     stopGameLoop() {
         if (this.gameLoopId) {
             clearInterval(this.gameLoopId);
@@ -338,6 +522,10 @@ class World {
         }
     }
 
+    /**
+     * Updates the game state and checks for collisions, object throws, and end boss alert.
+     * Handles animations, draws the game frame, and calls end screens if game is over.
+     */
     update() {
         if (this.isGameOver) {
             this.stopGameLoop();
@@ -345,20 +533,22 @@ class World {
             if (this.isGameOver) {
                 console.log('Game is over, drawing game over screen.');
                 this.drawGameOverScreen();
-            this.stopGameLoop();
-                    } else {
-                        if (Array.isArray(this.bottles)) {
-                            this.bottles.forEach(bottle => {
-                                bottle.playAnimation(bottle.IMAGES_BOTTLES);
-                            });
-                        }
-                        if (Array.isArray(this.coins)) {
-                            this.coins.forEach(coin => {
-                                coin.playAnimation(coin.IMAGES_COINS);
-                            });    
-                        }}
-        return;
-                    }
+                this.stopGameLoop();
+            } else {
+                if (Array.isArray(this.bottles)) {
+                    this.bottles.forEach(bottle => {
+                        bottle.playAnimation(bottle.IMAGES_BOTTLES);
+                    });
+                }
+                if (Array.isArray(this.coins)) {
+                    this.coins.forEach(coin => {
+                        coin.playAnimation(coin.IMAGES_COINS);
+                    });    
+                }
+            }
+            return;
+        }
+        
         this.checkCollisions();
         this.checkThrowObjects();
         this.checkCoinCollisions();
@@ -374,6 +564,11 @@ class World {
         this.draw();
     }
     
+    /**
+     * Updates animations for a set of objects based on the provided image key.
+     * @param {Object[]} objects - Array of game objects.
+     * @param {string} imagesKey - Key for the images to animate.
+     */
     updateAnimations(objects, imagesKey) {
         objects.forEach(obj => {
             if (obj.active) {
@@ -382,6 +577,9 @@ class World {
         });
     }
     
+    /**
+     * Updates the end boss's animation based on its current state.
+     */
     updateEndbossAnimation() {
         const endboss = this.level.enemies.find(enemy => enemy instanceof Endboss);
         if (endboss) {
@@ -389,20 +587,27 @@ class World {
         }
     }
 
+    /**
+     * Ends the game with a win or loss message, stops animations, and displays the game over screen.
+     * @param {string} message - The message to display on game over.
+     * @param {boolean} isWin - Whether the game ended in a win.
+     */
     gameOver(message = 'Spiel ist vorbei!', isWin = false) {
         if (this.isGameOver) return;
         this.isGameOver = true;
         this.isWin = isWin;
         this.stopAnimationLoop();
         setTimeout(() => {
-          this.draw();
-          this.stopAllAnimations();
+            this.draw();
+            this.stopAllAnimations();
         }, 50);
-      }
+    }
 
-      draw() {
+    /**
+     * Draws the entire game frame, including background objects, characters, items, and status bars.
+     */
+    draw() {
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-
         this.ctx.save();
         this.ctx.translate(this.camera_x, 0);
     
@@ -412,7 +617,6 @@ class World {
         this.addObjectsToMap(this.bottles);
         this.addToMap(this.character);
         this.addObjectsToMap(this.level.enemies);
-        // this.addObjectsToMap(this.throwableObjects);
     
         this.throwableObjects.forEach(obj => {
             if (obj.isSplashing) {
@@ -424,7 +628,7 @@ class World {
 
         this.ctx.restore();
     
-        this.coins.forEach((coin, index) => {
+        this.coins.forEach((coin) => {
             this.ctx.save();
             this.ctx.translate(coin.x - this.camera_x, coin.y);  
             coin.drawImage(this.ctx);
@@ -443,6 +647,9 @@ class World {
         }
     }
 
+    /**
+     * Draws the game over screen with a transparent overlay and a centered image.
+     */
     drawGameOverScreen() {
         const canvas = document.getElementById('canvas');
         const ctx = canvas.getContext('2d');
@@ -460,6 +667,9 @@ class World {
         ctx.globalAlpha = 1.0;  
     }
     
+    /**
+     * Draws the win screen with a transparent overlay and a centered image.
+     */
     drawWinScreen() {
         const canvas = document.getElementById('canvas');
         const ctx = canvas.getContext('2d');
@@ -477,6 +687,9 @@ class World {
         ctx.globalAlpha = 1.0; 
     }
 
+    /**
+     * Checks for collisions between the character and coins, adding to the score if collected.
+     */
     checkCoinCollisions() {
         this.coins.forEach((coin, index) => {
             if (this.character.isColliding(coin)) {
@@ -491,12 +704,20 @@ class World {
         });
     }
     
+    /**
+     * Adds an array of objects to the map by drawing them.
+     * @param {Object[]} objects - Array of objects to add to the map.
+     */
     addObjectsToMap(objects) {
         objects.forEach(o => {
             this.addToMap(o);
         });
     }
 
+    /**
+     * Adds a single object to the map, flipping it if it faces the opposite direction.
+     * @param {Object} mo - The moveable object to add to the map.
+     */
     addToMap(mo) { 
         if(mo.otherDirection) {
             this.flipImage(mo);
@@ -508,7 +729,10 @@ class World {
             this.flipImageBack(mo);
         }
     }
- 
+
+    /**
+     * Stops all active intervals in the game, including character animations.
+     */
     stopAllIntervals() {
         clearInterval(this.gameLoopId);
         this.character.stopAllAnimations();
@@ -525,6 +749,10 @@ class World {
         });
     }
     
+    /**
+     * Flips an image horizontally.
+     * @param {Object} mo - The moveable object whose image to flip.
+     */
     flipImage(mo) {
         this.ctx.save();
         this.ctx.translate(mo.width, 0);
@@ -532,6 +760,10 @@ class World {
         mo.x = mo.x * -1;
     }
 
+    /**
+     * Restores the flipped image back to its original orientation.
+     * @param {Object} mo - The moveable object whose image to flip back.
+     */
     flipImageBack(mo) {
         mo.x = mo.x * -1;
         this.ctx.restore();

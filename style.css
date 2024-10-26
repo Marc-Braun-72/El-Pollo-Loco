@@ -627,18 +627,21 @@ a.legal-link:hover {
 }
 
 #helpButton {
-    animation: pulse 2s ease-in-out;
-    animation-iteration-count: 5; 
+    animation: pulseRed 2s ease-in-out;
+    animation-iteration-count: 3; 
 }
 
-@keyframes pulse {
+@keyframes pulseRed {
     0%, 100% {
         transform: scale(1);
+        background-color: orange; 
     }
     50% {
-        transform: scale(1.2);
+        transform: scale(1.1);
+        background-color: red; 
     }
 }
+
 
 @media only screen and (max-width: 720px) {
     canvas {

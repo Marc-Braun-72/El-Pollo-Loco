@@ -1,5 +1,9 @@
 let level1;
 
+/**
+ * Initializes `level1` by creating a new Level instance with arrays of enemies, clouds, and background objects.
+ * Adds several `Chicken`, `Endboss`, `Babychicken`, `Cloud`, and `BackgroundObject` instances to configure the level.
+ */
 function initLevel() { 
     level1 = new Level(
         [
@@ -49,6 +53,4 @@ function initLevel() {
     );
 }
 
-
- initLevel();
-
+initLevel();
